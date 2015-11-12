@@ -1,0 +1,8 @@
+# MW
+
+This is (will be) a MultiWii controller for *nix systems.
+
+=== INSTALLATION ====
+Run ./autogen.sh (you will need automake for this to run)
+Run make
+
