@@ -1,8 +1,72 @@
 # MW
 
-This is (will be) a MultiWii controller for *nix systems.
+This is a MultiWii service for *nix systems.
 
-=== INSTALLATION ====
+The service comes with MultiWii service (mw) and a client - command line interface (mwcli).
+
+
+=== INSTALLATION ===
 Run ./autogen.sh (you will need automake for this to run)
 Run make
+
+
+=== SERVICE USAGE (mw) ===
+The service is a system wide application that connects to MultiWii controller over UART:
+- a host service that runs on start-up of the system
+- does 2 way translation between UART and clients using IPC (shm)
+- handles UART communication with MW
+
+Example:
+$ ./mw -h
+Usage:
+-h	help
+-b	run in background [defaults: 0]
+-v	verbosity flag [defaults: 255]
+-u	uart device path [defaults: /dev/ttyUSB0]
+kiwi@lubuntu-mac:~/rpicopter/MW$ ./mw
+(I) SHM: Initializing block: 0x7f1b52753000
+(I) SHM: Initializing block: 0x7f1b52750000
+(I) SHMMSP: Server initialized.
+(I) UART: Openining /dev/ttyUSB0
+(I) MW: Starting loop...
+(I) SHMMSP: Found outgoing record id: 0
+(I) SHM: Getting block id: 100 of block: 0x7f1b52753000, size: 34
+(I) MSP: To UART message id: 100, data size: 0
+(I) UART: tx: "24 4d 3c 00 64 64 ", len: 6
+(I) SHMMSP: Found outgoing record id: 100
+(I) SHM: Getting block id: 101 of block: 0x7f1b52753000, size: 34
+(I) MSP: To UART message id: 101, data size: 0
+(I) UART: tx: "24 4d 3c 00 65 65 ", len: 6
+(I) UART: rx: "24 4d 3e 07 64 f0 03 00 00 00 00 70 e0 24 4d 3e 0b 65 f4 0a 3c 00 01 00 00 00 00 00 00 ad ", len: 30
+(I) MSP: Queuing UART data, len: 30
+(I) SHM: Setting 34 bytes of block id: 100 of block: 0x7f1b52750000
+(I) SHM: Setting 34 bytes of block id: 101 of block: 0x7f1b52750000
+
+
+
+=== CLIENT USAGE (mwcli) ===
+The application provided is a very basic command line client. It has 2 modes of operation only:
+- listen, it will just sit and listen for any communication from the service
+- request a message (requires a message id to be provided), sends given message to mw service
+ 
+Example:
+$ ./mwcli -h
+Usage:
+-h	help
+-l	listen (sniffing) mode
+-p N	send message with id N
+kiwi@lubuntu-mac:~/rpicopter/MW$ ./mwcli -l
+(I) SHMMSP: Client initialized.
+(I) MSP: Preparing message MSP_IDENT
+(I) SHM: Setting 34 bytes of block id: 100 of block: 0x7f6f13700000
+(I) MSP: Preparing message MSP_STATUS
+(I) SHM: Setting 34 bytes of block id: 101 of block: 0x7f6f13700000
+(I) SHMMSP: Found incoming record id: 101
+(I) SHM: Getting block id: 100 of block: 0x7f6f136fd000, size: 34
+(I) MSP: Parsing MSP_IDENT
+(I) MSP: version: f0, multitype: 03, msp_version: 00, capability 70000000
+(I) SHMMSP: Found incoming record id: 100
+(I) SHM: Getting block id: 101 of block: 0x7f6f136fd000, size: 34
+(I) MSP: Parsing MSP_STATUS
+(I) MSP: cycleTime: 0af4, i2c_errors_count: 003c, sensor: 0001, flag: 00000000, currentSet: 00
 
