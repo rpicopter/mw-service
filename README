@@ -2,8 +2,18 @@
 
 This is a MultiWii service for *nix systems.
 
-The service comes with MultiWii service (mw) and a client - command line interface (mwcli).
+It consists of two modules - MultiWii service (mw) and a client - command line interface (mwcli). It is designed to run on SoC such as Raspberry Pi, BeagleBone, Odroid, etc.
 
+=== BACKGROUND ===
+MultiWii itself (http://www.multiwii.com) is a general purpose software to control multirotor RC model. It is design to work on Arduino and similar boards. Its footprint is very small and therefore it is very attractive controller for advanced pilots. However it requires additional software and components to configure and to run (transmitter, receiver, Arduino IDE, Windows PC, etc). This makes it unnecessarily difficult for people without flight controller experience to use it.
+
+This program (mw) is designed to change exactly this - to make MultiWii an attractive option to all the other flight controllers out there. It interfaces your MW controller with a computer. It works on *nix systems and is designed to extend the functionality of MultiWii. This way it becomes possible to for example implement WIFI based controller, Camera based position hold, and much more. It can also allow you to re-configure your controller in the field with the use of a mobile phone.
+
+=== FUNCTIONALITY ===
+At the moment MW is a service that exposes itself on a *nix systems for other programs to connect to it. It is a development version.          
+
+As the next step we will be looking to implement a WWW app that allows users to configure and run a quadcopter though a mobile or a computer in 
+field.  
 
 === INSTALLATION ===
 Run ./autogen.sh (you will need automake for this to run)
