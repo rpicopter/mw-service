@@ -2,7 +2,7 @@
 
 This is a MultiWii service for *nix systems.
 
-It consists of two modules - MultiWii service (mw) and a client - command line interface (mwcli). It is designed to run on SoC such as Raspberry Pi, BeagleBone, Odroid, etc.
+It consists of two modules - MultiWii service (mw) and a test client - command line interface (mwcli). It is designed to run on SoC such as Raspberry Pi, BeagleBone, Odroid, etc. but will also run on variety of other systems.
 
 === BACKGROUND ===
 MultiWii itself (http://www.multiwii.com) is a general purpose software to control multirotor RC model. It is design to work on Arduino and similar boards. Its footprint is very small and therefore it is very attractive controller for advanced pilots. However it requires additional software and components to configure and to run (transmitter, receiver, Arduino IDE, Windows PC, etc). This makes it unnecessarily difficult for people without flight controller experience to use it.

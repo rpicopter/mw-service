@@ -1,6 +1,8 @@
 AC_INIT([mw],[0.0.1],[gregory.dymarek@gmail.com])
 AM_INIT_AUTOMAKE([1.9 foreign])
 
+LT_INIT
+
 AC_PROG_CC
 
 AC_CONFIG_FILES([Makefile])
