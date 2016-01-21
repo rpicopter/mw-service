@@ -16,6 +16,11 @@ As the next step we will be looking to implement a WWW app that allows users to 
 field.  
 
 === INSTALLATION ===
+Ensure you have:
+- libtool
+- autotools
+- automake
+
 Run ./autogen.sh (you will need automake for this to run)
 Run make
 
