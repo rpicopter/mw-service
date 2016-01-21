@@ -1,4 +1,5 @@
-#include "shmmsp.h"
+#include "shm.h"
+#include "msp.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -10,7 +11,7 @@
 uint8_t verbosity = 0b11111111;
 uint8_t stop = 0;
 
-struct S_MSP_MSG msg;
+struct S_MSG msg;
 uint8_t request_message;
 int mode = -1;
 
@@ -60,7 +61,7 @@ void listen() {
 
 	while (!stop) {
 		mssleep(100);
-		if (shmmsp_scan_incoming(&msg)) {
+		if (shm_scan_incoming(&msg)) {
 			switch (msg.message_id) {
 				case 100: msp_parse_IDENT(&ident,&msg); break;
 				case 101: msp_parse_STATUS(&status,&msg); break;
@@ -83,14 +84,14 @@ int main (int argc, char **argv)
 
 	dbg_init(verbosity);	
 
-	if (shmmsp_client_init()) return -1;
+	if (shm_client_init()) return -1;
 
 	if (mode==1) { //-l was specified
 		//request IDENT and STATUS for demo
 		msp_IDENT(&msg); //prepare message
-		shmmsp_put_outgoing(&msg);  //send it to the service
+		shm_put_outgoing(&msg);  //send it to the service
 		msp_STATUS(&msg);
-		shmmsp_put_outgoing(&msg);
+		shm_put_outgoing(&msg);
 
 		//run loop
 		listen();
@@ -98,11 +99,11 @@ int main (int argc, char **argv)
 	else if (mode==0) { //-p was specified
 		msg.message_id = request_message;
 		msg.size = 0;
-		shmmsp_put_outgoing(&msg);
+		shm_put_outgoing(&msg);
 	}
 
 	
-	shmmsp_client_end();
+	shm_client_end();
 
 	return 0;
 }

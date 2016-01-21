@@ -2,14 +2,8 @@
 #define MSP_H
 
 #include <stdint.h>
+#include "msg.h"
 
-#define MSP_MAX_DATA_LEN 32 //the maximum length of a data in a MSP protocol (padded)
-
-struct S_MSP_MSG {
-	uint8_t message_id;
-	uint8_t size; 
-	uint8_t data[MSP_MAX_DATA_LEN];
-};
 
 struct S_MSP_IDENT {
 	uint8_t version;
@@ -55,25 +49,20 @@ struct S_MSP_RC {
 };
 
 
-void msp_IDENT(struct S_MSP_MSG *target);
-void msp_parse_IDENT(struct S_MSP_IDENT *target, struct S_MSP_MSG *msg);
+void msp_IDENT(struct S_MSG *target);
+void msp_parse_IDENT(struct S_MSP_IDENT *target, struct S_MSG *msg);
 
-void msp_STATUS(struct S_MSP_MSG *target);
-void msp_parse_STATUS(struct S_MSP_STATUS *status, struct S_MSP_MSG *msg);
+void msp_STATUS(struct S_MSG *target);
+void msp_parse_STATUS(struct S_MSP_STATUS *status, struct S_MSG *msg);
 
-void msp_RAW_IMU(struct S_MSP_MSG *target);
-void msp_parse_RAW_IMU(struct S_MSP_RAW_IMU *imu, struct S_MSP_MSG *msg);
+void msp_RAW_IMU(struct S_MSG *target);
+void msp_parse_RAW_IMU(struct S_MSP_RAW_IMU *imu, struct S_MSG *msg);
 
-void msp_SERVO(struct S_MSP_MSG *target);
-void msp_parse_SERVO(struct S_MSP_SERVO *servo, struct S_MSP_MSG *msg);
+void msp_SERVO(struct S_MSG *target);
+void msp_parse_SERVO(struct S_MSP_SERVO *servo, struct S_MSG *msg);
 
-void msp_RC(struct S_MSP_MSG *target);
-void msp_parse_RC(struct S_MSP_RC *status, struct S_MSP_MSG *msg);
-
-uint8_t msp_toUART(uint8_t *target, uint8_t *target_len, const struct S_MSP_MSG *msg);
-
-void msp_queueUART(const uint8_t *uart_msg, const int uart_msg_len);
-int8_t msp_fromUART(struct S_MSP_MSG *target);
+void msp_RC(struct S_MSG *target);
+void msp_parse_RC(struct S_MSP_RC *status, struct S_MSG *msg);
 
 #endif
 

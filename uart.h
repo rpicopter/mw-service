@@ -2,6 +2,7 @@
 #define UART_H
 
 #include <stdint.h>
+#include "msg.h"
 
 int uart_init(const char *path);
 void uart_close();

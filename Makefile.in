@@ -92,17 +92,15 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_mw_OBJECTS = mw-mw.$(OBJEXT) mw-debug.$(OBJEXT) mw-msp.$(OBJEXT) \
-	mw-shm.$(OBJEXT) mw-shmmsp.$(OBJEXT) mw-uart.$(OBJEXT) \
-	mw-endian.$(OBJEXT) mw-routines.$(OBJEXT)
+am_mw_OBJECTS = mw-mw.$(OBJEXT) mw-debug.$(OBJEXT) mw-shm.$(OBJEXT) \
+	mw-msg.$(OBJEXT) mw-uart.$(OBJEXT) mw-routines.$(OBJEXT)
 mw_OBJECTS = $(am_mw_OBJECTS)
 mw_DEPENDENCIES =
 mw_LINK = $(CCLD) $(mw_CFLAGS) $(CFLAGS) $(mw_LDFLAGS) $(LDFLAGS) -o \
 	$@
 am_mwcli_OBJECTS = mwcli-mwcli.$(OBJEXT) mwcli-shm.$(OBJEXT) \
-	mwcli-msp.$(OBJEXT) mwcli-shmmsp.$(OBJEXT) \
-	mwcli-endian.$(OBJEXT) mwcli-debug.$(OBJEXT) \
-	mwcli-routines.$(OBJEXT)
+	mwcli-msp.$(OBJEXT) mwcli-msg.$(OBJEXT) mwcli-endian.$(OBJEXT) \
+	mwcli-debug.$(OBJEXT) mwcli-routines.$(OBJEXT)
 mwcli_OBJECTS = $(am_mwcli_OBJECTS)
 mwcli_DEPENDENCIES =
 mwcli_LINK = $(CCLD) $(mwcli_CFLAGS) $(CFLAGS) $(mwcli_LDFLAGS) \
@@ -268,11 +266,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-mw_SOURCES = mw.c debug.c msp.c shm.c shmmsp.c uart.c endian.c routines.c
+mw_SOURCES = mw.c debug.c shm.c msg.c uart.c routines.c
 mw_CFLAGS = -Wall
 mw_LDFLAGS = 
 mw_LDADD = -lrt -lpthread
-mwcli_SOURCES = mwcli.c shm.c msp.c shmmsp.c endian.c debug.c routines.c 
+mwcli_SOURCES = mwcli.c shm.c msp.c msg.c endian.c debug.c routines.c 
 mwcli_CFLAGS = -Wall
 mwcli_LDFLAGS = 
 mwcli_LDADD = -lrt -lpthread
@@ -372,20 +370,18 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-debug.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-endian.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-msp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-msg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-mw.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-routines.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-shm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-shmmsp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mw-uart.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-endian.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-msg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-msp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-mwcli.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-routines.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-shm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mwcli-shmmsp.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -429,20 +425,6 @@ mw-debug.obj: debug.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-debug.obj `if test -f 'debug.c'; then $(CYGPATH_W) 'debug.c'; else $(CYGPATH_W) '$(srcdir)/debug.c'; fi`
 
-mw-msp.o: msp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-msp.o -MD -MP -MF $(DEPDIR)/mw-msp.Tpo -c -o mw-msp.o `test -f 'msp.c' || echo '$(srcdir)/'`msp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-msp.Tpo $(DEPDIR)/mw-msp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='msp.c' object='mw-msp.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-msp.o `test -f 'msp.c' || echo '$(srcdir)/'`msp.c
-
-mw-msp.obj: msp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-msp.obj -MD -MP -MF $(DEPDIR)/mw-msp.Tpo -c -o mw-msp.obj `if test -f 'msp.c'; then $(CYGPATH_W) 'msp.c'; else $(CYGPATH_W) '$(srcdir)/msp.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-msp.Tpo $(DEPDIR)/mw-msp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='msp.c' object='mw-msp.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-msp.obj `if test -f 'msp.c'; then $(CYGPATH_W) 'msp.c'; else $(CYGPATH_W) '$(srcdir)/msp.c'; fi`
-
 mw-shm.o: shm.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-shm.o -MD -MP -MF $(DEPDIR)/mw-shm.Tpo -c -o mw-shm.o `test -f 'shm.c' || echo '$(srcdir)/'`shm.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-shm.Tpo $(DEPDIR)/mw-shm.Po
@@ -457,19 +439,19 @@ mw-shm.obj: shm.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-shm.obj `if test -f 'shm.c'; then $(CYGPATH_W) 'shm.c'; else $(CYGPATH_W) '$(srcdir)/shm.c'; fi`
 
-mw-shmmsp.o: shmmsp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-shmmsp.o -MD -MP -MF $(DEPDIR)/mw-shmmsp.Tpo -c -o mw-shmmsp.o `test -f 'shmmsp.c' || echo '$(srcdir)/'`shmmsp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-shmmsp.Tpo $(DEPDIR)/mw-shmmsp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='shmmsp.c' object='mw-shmmsp.o' libtool=no @AMDEPBACKSLASH@
+mw-msg.o: msg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-msg.o -MD -MP -MF $(DEPDIR)/mw-msg.Tpo -c -o mw-msg.o `test -f 'msg.c' || echo '$(srcdir)/'`msg.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-msg.Tpo $(DEPDIR)/mw-msg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='msg.c' object='mw-msg.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-shmmsp.o `test -f 'shmmsp.c' || echo '$(srcdir)/'`shmmsp.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-msg.o `test -f 'msg.c' || echo '$(srcdir)/'`msg.c
 
-mw-shmmsp.obj: shmmsp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-shmmsp.obj -MD -MP -MF $(DEPDIR)/mw-shmmsp.Tpo -c -o mw-shmmsp.obj `if test -f 'shmmsp.c'; then $(CYGPATH_W) 'shmmsp.c'; else $(CYGPATH_W) '$(srcdir)/shmmsp.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-shmmsp.Tpo $(DEPDIR)/mw-shmmsp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='shmmsp.c' object='mw-shmmsp.obj' libtool=no @AMDEPBACKSLASH@
+mw-msg.obj: msg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-msg.obj -MD -MP -MF $(DEPDIR)/mw-msg.Tpo -c -o mw-msg.obj `if test -f 'msg.c'; then $(CYGPATH_W) 'msg.c'; else $(CYGPATH_W) '$(srcdir)/msg.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-msg.Tpo $(DEPDIR)/mw-msg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='msg.c' object='mw-msg.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-shmmsp.obj `if test -f 'shmmsp.c'; then $(CYGPATH_W) 'shmmsp.c'; else $(CYGPATH_W) '$(srcdir)/shmmsp.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-msg.obj `if test -f 'msg.c'; then $(CYGPATH_W) 'msg.c'; else $(CYGPATH_W) '$(srcdir)/msg.c'; fi`
 
 mw-uart.o: uart.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-uart.o -MD -MP -MF $(DEPDIR)/mw-uart.Tpo -c -o mw-uart.o `test -f 'uart.c' || echo '$(srcdir)/'`uart.c
@@ -484,20 +466,6 @@ mw-uart.obj: uart.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='uart.c' object='mw-uart.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-uart.obj `if test -f 'uart.c'; then $(CYGPATH_W) 'uart.c'; else $(CYGPATH_W) '$(srcdir)/uart.c'; fi`
-
-mw-endian.o: endian.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-endian.o -MD -MP -MF $(DEPDIR)/mw-endian.Tpo -c -o mw-endian.o `test -f 'endian.c' || echo '$(srcdir)/'`endian.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-endian.Tpo $(DEPDIR)/mw-endian.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='endian.c' object='mw-endian.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-endian.o `test -f 'endian.c' || echo '$(srcdir)/'`endian.c
-
-mw-endian.obj: endian.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-endian.obj -MD -MP -MF $(DEPDIR)/mw-endian.Tpo -c -o mw-endian.obj `if test -f 'endian.c'; then $(CYGPATH_W) 'endian.c'; else $(CYGPATH_W) '$(srcdir)/endian.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mw-endian.Tpo $(DEPDIR)/mw-endian.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='endian.c' object='mw-endian.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -c -o mw-endian.obj `if test -f 'endian.c'; then $(CYGPATH_W) 'endian.c'; else $(CYGPATH_W) '$(srcdir)/endian.c'; fi`
 
 mw-routines.o: routines.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mw_CFLAGS) $(CFLAGS) -MT mw-routines.o -MD -MP -MF $(DEPDIR)/mw-routines.Tpo -c -o mw-routines.o `test -f 'routines.c' || echo '$(srcdir)/'`routines.c
@@ -555,19 +523,19 @@ mwcli-msp.obj: msp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -c -o mwcli-msp.obj `if test -f 'msp.c'; then $(CYGPATH_W) 'msp.c'; else $(CYGPATH_W) '$(srcdir)/msp.c'; fi`
 
-mwcli-shmmsp.o: shmmsp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -MT mwcli-shmmsp.o -MD -MP -MF $(DEPDIR)/mwcli-shmmsp.Tpo -c -o mwcli-shmmsp.o `test -f 'shmmsp.c' || echo '$(srcdir)/'`shmmsp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mwcli-shmmsp.Tpo $(DEPDIR)/mwcli-shmmsp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='shmmsp.c' object='mwcli-shmmsp.o' libtool=no @AMDEPBACKSLASH@
+mwcli-msg.o: msg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -MT mwcli-msg.o -MD -MP -MF $(DEPDIR)/mwcli-msg.Tpo -c -o mwcli-msg.o `test -f 'msg.c' || echo '$(srcdir)/'`msg.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mwcli-msg.Tpo $(DEPDIR)/mwcli-msg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='msg.c' object='mwcli-msg.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -c -o mwcli-shmmsp.o `test -f 'shmmsp.c' || echo '$(srcdir)/'`shmmsp.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -c -o mwcli-msg.o `test -f 'msg.c' || echo '$(srcdir)/'`msg.c
 
-mwcli-shmmsp.obj: shmmsp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -MT mwcli-shmmsp.obj -MD -MP -MF $(DEPDIR)/mwcli-shmmsp.Tpo -c -o mwcli-shmmsp.obj `if test -f 'shmmsp.c'; then $(CYGPATH_W) 'shmmsp.c'; else $(CYGPATH_W) '$(srcdir)/shmmsp.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mwcli-shmmsp.Tpo $(DEPDIR)/mwcli-shmmsp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='shmmsp.c' object='mwcli-shmmsp.obj' libtool=no @AMDEPBACKSLASH@
+mwcli-msg.obj: msg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -MT mwcli-msg.obj -MD -MP -MF $(DEPDIR)/mwcli-msg.Tpo -c -o mwcli-msg.obj `if test -f 'msg.c'; then $(CYGPATH_W) 'msg.c'; else $(CYGPATH_W) '$(srcdir)/msg.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mwcli-msg.Tpo $(DEPDIR)/mwcli-msg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='msg.c' object='mwcli-msg.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -c -o mwcli-shmmsp.obj `if test -f 'shmmsp.c'; then $(CYGPATH_W) 'shmmsp.c'; else $(CYGPATH_W) '$(srcdir)/shmmsp.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -c -o mwcli-msg.obj `if test -f 'msg.c'; then $(CYGPATH_W) 'msg.c'; else $(CYGPATH_W) '$(srcdir)/msg.c'; fi`
 
 mwcli-endian.o: endian.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mwcli_CFLAGS) $(CFLAGS) -MT mwcli-endian.o -MD -MP -MF $(DEPDIR)/mwcli-endian.Tpo -c -o mwcli-endian.o `test -f 'endian.c' || echo '$(srcdir)/'`endian.c

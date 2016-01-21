@@ -1,5 +1,6 @@
 #include "debug.h"
-#include "shmmsp.h"
+#include "msg.h"
+#include "shm.h"
 #include "uart.h"
 #include "routines.h"
 
@@ -52,14 +53,14 @@ int set_defaults(int c, char **a) {
 int main (int argc, char **argv)
 {
 
-	struct S_MSP_MSG msg;
+	struct S_MSG msg;
 	uint8_t buf[255];
 	uint8_t len;
 
 	struct timespec time_prev, time_cur;
 	long dt_ms;
 
-	int ret;
+	int i,ret,buf_ptr = 0;
 
 	//evaluate options
 	if (set_defaults(argc,argv)) return -1;
@@ -75,7 +76,7 @@ int main (int argc, char **argv)
 	time_prev = time_cur;
 
 
-	if (shmmsp_server_init()) return -1;
+	if (shm_server_init()) return -1;
 
   	if (uart_init(uart_path)) return -1;
 
@@ -89,28 +90,37 @@ int main (int argc, char **argv)
 		clock_gettime(CLOCK_REALTIME, &time_prev);
 
 
-		ret = uart_read(buf,255);
+		if (buf_ptr>=255) {
+			dbg(DBG_MW|DBG_ERROR,"Reading buffer overflow! Resetting.\n");
+			buf_ptr = 0;
+		}
+		ret = uart_read(buf+buf_ptr,255-buf_ptr);
 		if (ret>0) { //received some data
-			msp_queueUART(buf,ret);
-			while ((ret=msp_fromUART(&msg))) { //retrieve msg from buffer 
-				if (ret==1) {
-					shmmsp_put_incoming(&msg);
-				} //else crc error
+			buf_ptr+=ret;
+			i = 0;
+			while ((ret=msg_parse(&msg,buf+i,buf_ptr-i))) { //retrieve msg from buffer 			
+				 i+=ret;
+				 if (msg.message_id)
+					shm_put_incoming(&msg);
+			}
+			if (i) { //rewind buffer by number of process bytes			
+				memmove(buf,buf+i,buf_ptr-i);
+				buf_ptr = buf_ptr - i;
 			}
 		}
 
 		
-		while ((ret=shmmsp_scan_outgoing(&msg))) {
+		while ((ret=shm_scan_outgoing(&msg))) {
 			if (ret==1) {
-				msp_toUART(buf,&len,&msg);
-				uart_write(buf,len);
+				ret = msg_serialize(buf,&msg);
+				uart_write(buf,ret);
 			}
 		}
 	}
 
 	uart_close();
 
-	shmmsp_server_end();
+	shm_server_end();
 
 	return 0;
 }

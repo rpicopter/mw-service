@@ -6,8 +6,34 @@
 #include <stdio.h>
 #include <errno.h>
 
+#define UART_MSG_MAX 0xFF
 
 static int uart_fd = -1;
+
+/* we use buffers to reduce number of system calls 
+
+static uint8_t buffer_in[UART_MSG_MAX];
+static uint8_t in_w_ptr = 0, in_r_ptr = 0;
+
+static uint8_t buffer_out[UART_MSG_MAX];
+static uint8_t out_ptr = 0;
+*/
+
+/* to be moved somewhere else
+void _uart_recv_stash(const uint8_t *uart_msg, const int uart_msg_len) {
+        dbg(DBG_UART|DBG_VERBOSE,"Queuing incoming UART data, len: %i\n",uart_msg_len);
+        int i;
+        for (i=0;i<uart_msg_len;i++) {
+                buffer_in[in_w_ptr++] = uart_msg[i];
+                if (in_w_ptr>=UART_MSG_MAX) in_w_ptr=0;
+                if (in_w_ptr == in_r_ptr) { 
+                        dbg(DBG_UART|DBG_ERROR,"buffer_in overflow!!\n");
+                        return;
+                }
+        }       
+}
+*/
+
 
 int uart_init(const char *path) {
         dbg(DBG_UART|DBG_VERBOSE,"Openining %s\n",path);
