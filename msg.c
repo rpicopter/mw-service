@@ -13,7 +13,7 @@ uint8_t msg_crc(const struct S_MSG *msg) {
 
 //returns number of bytes written into target
 uint8_t msg_serialize(uint8_t *target, const struct S_MSG *msg) {
-	dbg(DBG_MW|DBG_VERBOSE,"Serializing, id: %u, data size: %u\n",msg->message_id,msg->size);
+	dbg(DBG_MSG|DBG_VERBOSE,"Serializing, id: %u, data size: %u\n",msg->message_id,msg->size);
 	target[0] = '$';
 	target[1] = 'M';
 	target[2] = '<';
@@ -27,12 +27,14 @@ uint8_t msg_serialize(uint8_t *target, const struct S_MSG *msg) {
 
 //returns 0 if no message found, otherwise returns number of bytes consumed (in case of error returned message_id will be nulled)
 uint8_t msg_parse(struct S_MSG *target, const uint8_t *buf, uint8_t buf_len) {
-	dbg(DBG_MW|DBG_VERBOSE,"Parsing, data size: %u\n",buf_len);	
+	dbg(DBG_MSG|DBG_VERBOSE,"Parsing, data size: %u\n",buf_len);	
+
 	uint8_t crc;
 	uint8_t state = 0;
 
 	uint8_t i = 0;
 	uint8_t j = 0;
+
 
 	for (i=0;i<buf_len && state<=6;i++) {
 		switch (state) {
@@ -64,25 +66,25 @@ uint8_t msg_parse(struct S_MSG *target, const uint8_t *buf, uint8_t buf_len) {
 			case 6: //crc 
 				crc = msg_crc(target);
 				if (crc == buf[i]) state++;
-				else {
-					dbg(DBG_MW|DBG_ERROR,"CRC Error. Expected: %02x, calculated: %02x\n",buf[i],crc);
-					state+=2;	
-				}
+				else state+=2;					
 				break;
 		} 
 	}
 
 	if (state<=6) { //end of buffer without message (i.e. message not complete)
+		dbg(DBG_MSG|DBG_VERBOSE,"Message not found.\n");	
 		target->message_id = 0;
 		return 0;
 	}
 
 	if (state==7) {//message found		
 		//target is set
+		dbg(DBG_MSG|DBG_VERBOSE,"Found message id: %u found. Consumed bytes: %u\n",target->message_id,i);	
 		return i;
 	}
 
 	if (state==8) { //something wrong
+		dbg(DBG_MSG|DBG_ERROR,"CRC Error. Expected: %02x, calculated: %02x. Consumed bytes: %u\n",buf[i],crc,i);
 		target->message_id = 0;
 		return i;
 	}

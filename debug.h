@@ -8,6 +8,7 @@
 #define DBG_MSP      0b01000000
 #define DBG_SHM      0b00100000
 #define DBG_UART     0b00010000
+#define DBG_MSG      0b00001000
 
 #define DBG_LEVELS   0b00000111  
 #define DBG_ERROR    0b00000001

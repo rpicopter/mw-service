@@ -176,7 +176,7 @@ uint8_t shm_scan_incoming_f(struct S_MSG *target, uint8_t *filter, uint8_t filte
 	for (i=0;i<filter_len;i++) {
 		_v = filter[i];
 		if (block_in->counter[_v]!=compare_in[_v]) {
-			dbg(DBG_SHM|DBG_VERBOSE,"Found incoming record id: %u\n",target->message_id);
+			dbg(DBG_SHM|DBG_VERBOSE,"Found incoming record: %u\n",_v);
 			_shm_get((uint8_t*)target,block_in,_v);
 			compare_in[_v] = block_in->counter[_v];
 			return 1;
@@ -189,7 +189,7 @@ uint8_t shm_scan_incoming(struct S_MSG *target) {
 	static uint8_t i;
 	for (i=0;i<SHM_SIZE;i++)
 		if (block_in->counter[i]!=compare_in[i]) {
-			dbg(DBG_SHM|DBG_VERBOSE,"Found incoming record id: %u\n",target->message_id);
+			dbg(DBG_SHM|DBG_VERBOSE,"Found incoming record: %u\n",i);
 			_shm_get((uint8_t*)target,block_in,i);
 			compare_in[i] = block_in->counter[i];
 			return 1;
@@ -203,7 +203,7 @@ uint8_t shm_scan_outgoing_f(struct S_MSG *target, uint8_t *filter, uint8_t filte
 	for (i=0;i<filter_len;i++) {
 		_v = filter[i];
 		if (block_out->counter[_v]!=compare_out[_v]) {
-			dbg(DBG_SHM|DBG_VERBOSE,"Found outgoing record id: %u\n",target->message_id);
+			dbg(DBG_SHM|DBG_VERBOSE,"Found outgoing record: %u\n",_v);
 			_shm_get((uint8_t*)target,block_out,_v);
 			compare_out[_v] = block_out->counter[_v];
 			return 1;
@@ -216,7 +216,7 @@ uint8_t shm_scan_outgoing(struct S_MSG *target) {
 	static uint8_t i;
 	for (i=0;i<SHM_SIZE;i++)
 		if (block_out->counter[i]!=compare_out[i]) {
-			dbg(DBG_SHM|DBG_VERBOSE,"Found outgoing record id: %u\n",target->message_id);
+			dbg(DBG_SHM|DBG_VERBOSE,"Found outgoing record: %u\n",i);
 			_shm_get((uint8_t*)target,block_out,i);
 			compare_out[i] = block_out->counter[i];
 			return 1;

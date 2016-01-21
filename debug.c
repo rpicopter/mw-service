@@ -13,6 +13,7 @@ static void dbg_print_prefix(uint8_t mask) {
 	else if (mask & DBG_SHM) printf("SHM: ");
 	else if (mask & DBG_MW) printf("MW: ");
 	else if (mask & DBG_UART) printf("UART: ");
+	else if (mask & DBG_MSG) printf("MSG: ");
 	else printf(": ");
 }
 
