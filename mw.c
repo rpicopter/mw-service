@@ -8,8 +8,10 @@
 #include <getopt.h>
 #include <string.h>
 #include <signal.h>
+#include <errno.h>
+#include <sys/select.h>
 
-#define LOOP_TIME 20
+#define BUFFER_SIZE 255
 
 uint8_t stop = 0;
 
@@ -54,13 +56,19 @@ int main (int argc, char **argv)
 {
 
 	struct S_MSG msg;
-	uint8_t buf[255];
-	uint8_t len;
+	uint8_t bufin[BUFFER_SIZE];
+	uint8_t bufin_start=0,bufin_end=0;
 
-	struct timespec time_prev, time_cur;
-	long dt_ms;
+	uint8_t bufout[BUFFER_SIZE];
+	uint8_t bufout_start=0,bufout_end=0;
 
-	int i,ret,buf_ptr = 0;
+
+	int i,ret;
+
+	//,ret,buf_ptr = 0;
+	int fd = 0;
+	fd_set rlist, wlist, elist;
+	struct timeval tv;
 
 	//evaluate options
 	if (set_defaults(argc,argv)) return -1;
@@ -72,55 +80,95 @@ int main (int argc, char **argv)
 	signal(SIGTERM, catch_signal);
 	signal(SIGINT, catch_signal);
 
-	clock_gettime(CLOCK_REALTIME, &time_cur);
-	time_prev = time_cur;
-
 
 	if (shm_server_init()) return -1;
 
-  	if (uart_init(uart_path)) return -1;
+	fd = uart_init(uart_path);
 
-	dbg(DBG_MW|DBG_VERBOSE,"Starting loop...\n");
+  	if (fd<0) return -1;
+
+	printf("Started\n");
 
 	while (!stop) {
-		//ensure loop works 
-		clock_gettime(CLOCK_REALTIME, &time_cur);
-		dt_ms = TimeSpecMS(TimeSpecDiff(&time_cur,&time_prev));
-		if (dt_ms<LOOP_TIME) mssleep(LOOP_TIME-dt_ms);
-		clock_gettime(CLOCK_REALTIME, &time_prev);
+        tv.tv_sec = 0;
+        tv.tv_usec = 10000; //every 50ms
+
+        FD_ZERO(&rlist);
+        FD_ZERO(&wlist);
+        FD_ZERO(&elist);
+
+        FD_SET(fd, &elist);
+        FD_SET(fd, &rlist);
+        if (bufout_end!=bufout_start)
+        	FD_SET(fd, &wlist);
 
 
-		if (buf_ptr>=255) {
-			dbg(DBG_MW|DBG_ERROR,"Reading buffer overflow! Resetting.\n");
-			buf_ptr = 0;
-		}
-		ret = uart_read(buf+buf_ptr,255-buf_ptr);
-		if (ret>0) { //received some data
-			buf_ptr+=ret;
-			i = 0;
-			while ((ret=msg_parse(&msg,buf+i,buf_ptr-i))) { //retrieve msg from buffer 			
-				 i+=ret;
-				 if (msg.message_id)
-					shm_put_incoming(&msg);
-			}
-			if (i) { //rewind buffer by number of process bytes			
-				memmove(buf,buf+i,buf_ptr-i);
-				buf_ptr = buf_ptr - i;
-			}
-		}
+        ret = select(fd+1, &rlist, &wlist, &elist, &tv);
 
-		
-		while ((ret=shm_scan_outgoing(&msg))) {
-			if (ret==1) {
-				ret = msg_serialize(buf,&msg);
-				uart_write(buf,ret);
+        if (FD_ISSET(fd, &elist)) {
+            dbg(DBG_MW|DBG_ERROR,"Exception\n");
+            break;
+        }
+
+        if (ret == -1) {
+            dbg(DBG_MW|DBG_ERROR,"Select exception: %s\n",strerror(errno));
+            stop = 1;
+            break;
+        }  
+
+        if (FD_ISSET(fd, &wlist)) {
+			i=uart_write(bufout+bufout_start,bufout_end-bufout_start);
+			if (i<0) { 
+				dbg(DBG_MW|DBG_ERROR,"Writing to device error: %s\n",strerror(errno));
+				stop = 1;
+				break;
 			}
-		}
+			bufout_start+=i;
+			
+			if (i==(bufout_end-bufout_start)) {//we wrote everything
+				bufout_end=bufout_start=0;
+			} else { //partial write, rewind
+				memmove(bufout,bufout+bufout_start,bufout_end-bufout_start);
+				bufout_end -= bufout_start;
+				bufout_start = 0;
+			}        	
+        }
+
+
+        ret = 1; 
+        while (ret && (BUFFER_SIZE-bufout_end>MSG_MAX_DATA_LEN)) { //if we have space in buffer
+			ret = shm_scan_outgoing(&msg); 
+			if (ret==1) bufout_end += msg_serialize(bufout+bufout_end,&msg);    	
+        }
+
+
+        if (FD_ISSET(fd, &rlist)) {
+        	if (BUFFER_SIZE-bufin_end<MSG_MAX_DATA_LEN) {
+				dbg(DBG_MW|DBG_ERROR,"Reading buffer overflow! Resetting.\n");
+				bufin_start=bufin_end = 0;
+			}
+        	ret = uart_read(bufin+bufin_end,BUFFER_SIZE-bufin_end);
+        	if (ret>0) { //received some data
+				bufin_end+=ret;
+				while (ret=msg_parse(&msg,bufin+bufin_start,bufin_end-bufin_start)) { //retrieve msg from buffer 			
+					bufin_start+=ret;
+				 	if (msg.message_id)
+						shm_put_incoming(&msg);
+				}
+				if (bufin_start) { //rewind buffer by number of process bytes			
+					memmove(bufin,bufin+bufin_start,bufin_end-bufin_start);
+					bufin_end-=bufin_start;
+					bufin_start = 0;
+				}
+			}
+       	}
 	}
 
 	uart_close();
 
 	shm_server_end();
+
+	printf("End");
 
 	return 0;
 }
