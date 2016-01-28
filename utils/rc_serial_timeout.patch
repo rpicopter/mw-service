@@ -1,0 +1,12 @@
+diff -rupN multiwii-firmware.orig/Protocol.cpp multiwii-firmware/Protocol.cpp
+--- multiwii-firmware.orig/Protocol.cpp	2016-01-28 12:33:07.688710854 +0000
++++ multiwii-firmware/Protocol.cpp	2016-01-27 17:14:55.900077563 +0000
+@@ -269,7 +269,7 @@ void evaluateCommand(uint8_t c) {
+     //  break;
+     case MSP_SET_RAW_RC:
+       s_struct_w((uint8_t*)&rcSerial,16);
+-      rcSerialCount = 50; // 1s transition 
++      rcSerialCount = 250; // 1s transition 
+       break;
+     case MSP_SET_PID:
+       mspAck();
