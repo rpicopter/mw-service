@@ -5,8 +5,8 @@
 const int _i = 1;
 #define is_bigendian() ( (*(char*)&_i) == 0 )
 
-uint16_t reverse16 (uint8_t *c) {
-    uint16_t s;
+uint16_t *reverse16 (uint8_t *c) {
+    static uint16_t s;
     uint8_t *p = (uint8_t *)&s;
 
     if (!is_bigendian()) {
@@ -17,11 +17,11 @@ uint16_t reverse16 (uint8_t *c) {
         p[1] = c[0];
     }
 
-    return s;
+    return &s;
 }
 
-uint32_t reverse32 (uint8_t *c) {
-    uint32_t i;
+uint32_t *reverse32 (uint8_t *c) {
+    static uint32_t i;
     uint8_t *p = (uint8_t *)&i;
 
     if (!is_bigendian()) {
@@ -36,6 +36,6 @@ uint32_t reverse32 (uint8_t *c) {
         p[3] = c[0];
     }
 
-    return i;
+    return &i;
 }
 

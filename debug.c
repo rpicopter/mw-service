@@ -1,15 +1,18 @@
 #include "debug.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
 
 static uint8_t dbg_mask;
 
 static void dbg_print_prefix(uint8_t mask) {
-	if (mask & DBG_ERROR) printf("(E) ");
+	if ((mask & DBG_LEVELS)==DBG_LEVELS) printf("    ");
+	else if (mask & DBG_ERROR) printf("(E) ");
 	else if (mask & DBG_WARNING) printf("(W) ");
 	else if (mask & DBG_VERBOSE) printf("(I) ");
 
-	if (mask & DBG_MSP) printf("MSP: ");
+	if ((mask & DBG_MODULES)==DBG_MODULES) printf("    ");
+	else if (mask & DBG_MSP) printf("MSP: ");
 	else if (mask & DBG_SHM) printf("SHM: ");
 	else if (mask & DBG_MW) printf("MW: ");
 	else if (mask & DBG_UART) printf("UART: ");
@@ -38,16 +41,27 @@ void dbg_init(uint8_t caps) {
 	if (dbg_mask & DBG_WARNING) dbg_mask |= DBG_ERROR;
 }
 
+void dbg_print_timestamp() {
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time ( &rawtime );
+  timeinfo = localtime ( &rawtime );
+  printf("%s   ",asctime(timeinfo));
+}
+
 void dbg(uint8_t mask, const char *format, ...)
 {
     va_list args;
     va_start(args, format);
 
-    if((mask & dbg_mask & DBG_MODULES) && (mask & dbg_mask & DBG_LEVELS)) {
+    if ((mask & dbg_mask & DBG_MODULES) && (mask & dbg_mask & DBG_LEVELS)) {
+	dbg_print_timestamp();
 	dbg_print_prefix(mask);
 	vprintf(format, args);
     }
 
     va_end(args);
+    fflush(stdout);
 }
 

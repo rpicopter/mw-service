@@ -62,6 +62,7 @@ void msp_SERVO(struct S_MSG *target);
 void msp_parse_SERVO(struct S_MSP_SERVO *servo, struct S_MSG *msg);
 
 void msp_RC(struct S_MSG *target);
+void msp_SET_RAW_RC(struct S_MSG *target, struct S_MSP_RC *rc);
 void msp_parse_RC(struct S_MSP_RC *status, struct S_MSG *msg);
 
 #endif

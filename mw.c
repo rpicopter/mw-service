@@ -87,11 +87,11 @@ int main (int argc, char **argv)
 
   	if (fd<0) return -1;
 
-	printf("Started\n");
+	dbg(DBG_MW|DBG_LEVELS,"Started\n");
 
 	while (!stop) {
         tv.tv_sec = 0;
-        tv.tv_usec = 10000; //every 50ms
+        tv.tv_usec = 10000; //every 10ms
 
         FD_ZERO(&rlist);
         FD_ZERO(&wlist);
@@ -119,7 +119,7 @@ int main (int argc, char **argv)
         if (FD_ISSET(fd, &wlist)) {
 			i=uart_write(bufout+bufout_start,bufout_end-bufout_start);
 			if (i<0) { 
-				dbg(DBG_MW|DBG_ERROR,"Writing to device error: %s\n",strerror(errno));
+				dbg(DBG_MW|DBG_ERROR,"Writing to device error (%i %i): %s\n",bufout_start,bufout_end,strerror(errno));
 				stop = 1;
 				break;
 			}
@@ -168,7 +168,7 @@ int main (int argc, char **argv)
 
 	shm_server_end();
 
-	printf("End");
+	dbg(DBG_MW|DBG_LEVELS,"End\n");
 
 	return 0;
 }

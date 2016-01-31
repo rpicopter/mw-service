@@ -1,9 +1,9 @@
 lib_LTLIBRARIES=libmw_core.la
-libmw_core_la_SOURCES=debug.c shm.c msg.c
+libmw_core_la_SOURCES=debug.c shm.c msg.c msp.c endian.c
 libmw_core_la_CFLAGS=-fPIC
 libmw_core_la_LDFLAGS=-fPIC
 libmw_core_includedir = $(includedir)/mw
-libmw_core_include_HEADERS = debug.h shm.h msg.h
+libmw_core_include_HEADERS = debug.h shm.h msg.h msp.h endian.h
 
 bin_PROGRAMS = mw mwcli
 mw_SOURCES = mw.c routines.c uart.c
