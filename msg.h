@@ -13,6 +13,12 @@ struct S_MSG {
 	uint8_t data[MSG_MAX_DATA_LEN];
 };
 
+uint16_t msg_get_crc_error_count();
+
+uint16_t msg_get_rx_count();
+
+uint16_t msg_get_tx_count();
+
 uint8_t msg_crc(const struct S_MSG *msg);
 
 uint8_t msg_serialize(uint8_t *target, const struct S_MSG *msg);

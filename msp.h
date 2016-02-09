@@ -48,6 +48,39 @@ struct S_MSP_RC {
 	uint16_t aux4;	
 };
 
+enum box {
+  BOXARM, //0
+  BOXANGLE, //1
+  BOXHORIZON, //2
+  BOXBARO, //3
+  BOXVARIO, //4
+  BOXMAG, //5
+  BOXHEADFREE, //6
+  BOXHEADADJ, // 7 acquire heading for HEADFREE mode
+  BOXCAMSTAB,// 8
+  BOXCAMTRIG, //9
+  BOXGPSHOME, //10
+  BOXGPSHOLD, //11
+  BOXPASSTHRU, //12
+  BOXBEEPERON, //13
+  BOXLEDMAX, //14 we want maximum illumination
+  BOXLEDLOW, //15 low/no lights
+  BOXLLIGHTS, //16 enable landing lights at any altitude
+  BOXCALIB, //17
+  BOXGOV, //18
+  BOXOSD, //19
+  BOXGPSNAV, //20
+  BOXLAND, //21
+  CHECKBOXITEMS //22
+};
+
+//EXTENDED_AUX_STATES not supported
+struct S_MSP_BOXCONFIG {
+	uint8_t supported[CHECKBOXITEMS];
+	uint16_t active[CHECKBOXITEMS];
+};
+
+
 
 void msp_IDENT(struct S_MSG *target);
 void msp_parse_IDENT(struct S_MSP_IDENT *target, struct S_MSG *msg);
@@ -64,6 +97,16 @@ void msp_parse_SERVO(struct S_MSP_SERVO *servo, struct S_MSG *msg);
 void msp_RC(struct S_MSG *target);
 void msp_SET_RAW_RC(struct S_MSG *target, struct S_MSP_RC *rc);
 void msp_parse_RC(struct S_MSP_RC *status, struct S_MSG *msg);
+
+void msp_BOXIDS(struct S_MSG *target);
+void msp_parse_BOXIDS(struct S_MSP_BOXCONFIG *boxconf, struct S_MSG *msg);
+
+void msp_BOX(struct S_MSG *target);
+void msp_parse_BOX(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg);
+
+void msp_SET_BOX(struct S_MSG *target, struct S_MSP_BOXCONFIG *box);
+
+void msp_custom(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length);
 
 #endif
 

@@ -1,6 +1,7 @@
 #include "debug.h"
 #include "msg.h"
 #include "shm.h"
+#include "msp.h"
 #include "uart.h"
 #include "routines.h"
 
@@ -51,6 +52,19 @@ int set_defaults(int c, char **a) {
 	return 0;
 } 
 
+void get_local_status(struct S_MSG *msg) {
+	uint16_t x;
+	uint8_t buf[16];
+
+	x = msg_get_crc_error_count();
+	memcpy(buf,&x,2);
+	x = msg_get_rx_count();
+	memcpy(buf+2,&x,2);
+	x = msg_get_tx_count();
+	memcpy(buf+4,&x,2);
+
+	msp_custom(msg,50,buf,6);
+}
 
 int main (int argc, char **argv)
 {
@@ -138,7 +152,16 @@ int main (int argc, char **argv)
         ret = 1; 
         while (ret && (BUFFER_SIZE-bufout_end>MSG_MAX_DATA_LEN)) { //if we have space in buffer
 			ret = shm_scan_outgoing(&msg); 
-			if (ret==1) bufout_end += msg_serialize(bufout+bufout_end,&msg);    	
+			if (ret==1) {
+				switch (msg.message_id)	{
+					case 50: //this is our custom status message
+						get_local_status(&msg);
+						shm_put_incoming(&msg);
+						break;
+					default: //add message to buffer for sending later
+						bufout_end += msg_serialize(bufout+bufout_end,&msg);
+				}
+			}	
         }
 
 

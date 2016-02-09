@@ -12,12 +12,12 @@ void mssleep(unsigned int ms) {
 }
 
 
-struct timespec *TimeSpecDiff(struct timespec *ts1, struct timespec *ts2)
+struct timespec *TimeSpecDiff(struct timespec *ts1, struct timespec *ts2) //difference between ts1 and ts2
 {
         static struct timespec ts;
         ts.tv_sec = ts1->tv_sec - ts2->tv_sec;
         ts.tv_nsec = ts1->tv_nsec - ts2->tv_nsec;
-        if (ts.tv_nsec < 0) {
+        if (ts.tv_nsec < 0) { //wrap around
                 ts.tv_sec--;
                 ts.tv_nsec += 1000000000;
         }

@@ -6,6 +6,7 @@
 
 #define SHM_SIZE 0xFF
 #define SHM_MSG_SIZE 36 //should be the max size of a MW message (should be 34 but need to confirm if allignment is an issue)
+//MSP_BOXNAMES is a special case as we gonna parse it immediately before storing so no need to store the entire message
 
 typedef uint8_t SHM_MSG[SHM_MSG_SIZE];
 

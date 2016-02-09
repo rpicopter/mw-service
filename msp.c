@@ -67,7 +67,7 @@ void msp_SERVO(struct S_MSG *target) {
 }
 
 void msp_parse_SERVO(struct S_MSP_SERVO *servo, struct S_MSG *msg) {
-	int i;
+	uint8_t i;
 	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_SERVO\n");
 	for (i=0;i<8;i++)
 		servo->servo[i] = *reverse16(msg->data+(i*2));
@@ -108,4 +108,65 @@ void msp_parse_RC(struct S_MSP_RC *rc, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"R: %04x, P: %04x, Y: %04x, T: %04x, A1: %04x, A2: %04x, A3: %04x, A4: %04x\n",rc->roll,rc->pitch,rc->yaw,rc->throttle, rc->aux1, rc->aux2, rc->aux3, rc->aux4);
 }
 
+void msp_BOXIDS(struct S_MSG *target) {
+    dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_BOXIDS\n");
+    target->message_id = 119;
+    target->size = 0;
+}
+
+void msp_parse_BOXIDS(struct S_MSP_BOXCONFIG *boxconf, struct S_MSG *msg) {
+	uint8_t i,bid;
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_BOXIDS\n");
+	memset(boxconf->supported,0,CHECKBOXITEMS);
+	dbg(DBG_MSP|DBG_VERBOSE,"Supported boxes: ");
+	for (i=0;i<msg->size;i++) {
+		bid = *(msg->data+i); //boxid
+		boxconf->supported[ bid ] = 1;
+		dbg(DBG_MSP|DBG_VERBOSE,"%u ",bid);
+	}
+	dbg(DBG_MSP|DBG_VERBOSE,"\n");
+}
+
+void msp_BOX(struct S_MSG *target) {
+    dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_BOX\n");
+    target->message_id = 113;
+    target->size = 0;
+}
+
+void msp_parse_BOX(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg) {
+	uint8_t i,j = 0;
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_BOX\n");
+	memset(box->active,0,CHECKBOXITEMS);
+	dbg(DBG_MSP|DBG_VERBOSE,"Box config: ");
+	for (i=0;i<CHECKBOXITEMS;i++) {
+		if (box->supported[i]) {
+			box->active[i] = *reverse16(&msg->data[2*j]);
+			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,box->active[i]);
+			j++;
+		}
+	}
+	dbg(DBG_MSP|DBG_VERBOSE,"\n");
+}
+
+void msp_SET_BOX(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
+	uint8_t i,j = 0;
+    dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SET_BOX\n");
+    target->message_id = 203;
+    dbg(DBG_MSP|DBG_VERBOSE,"Setting box config: ");
+	for (i=0;i<CHECKBOXITEMS;i++) {
+		if (box->supported[i]) {
+			memcpy(target->data+(j*2),reverse16(&box->active[i]),2);
+			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,box->active[i]);
+			j++;
+		}
+	}
+	target->size = 2*j;
+}
+
+void msp_custom(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing custom message: %u\n",id);
+	target->message_id = id;
+	target->size = length;
+	memcpy(target->data,data,length);
+}
 

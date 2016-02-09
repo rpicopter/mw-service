@@ -1,5 +1,21 @@
 #include "msg.h"
 
+static uint16_t crc_error = 0;
+static uint16_t msg_tx_count = 0;
+static uint16_t msg_rx_count = 0;
+
+uint16_t msg_get_crc_error_count() {
+	return crc_error;
+}
+
+uint16_t msg_get_rx_count() {
+	return msg_rx_count;
+}
+
+uint16_t msg_get_tx_count() {
+	return msg_tx_count;
+}
+
 /*
         Helper function to calculate CRC as per MSP protocol
 */
@@ -13,6 +29,8 @@ uint8_t msg_crc(const struct S_MSG *msg) {
 
 //returns number of bytes written into target
 uint8_t msg_serialize(uint8_t *target, const struct S_MSG *msg) {
+	msg_tx_count++;
+
 	dbg(DBG_MSG|DBG_VERBOSE,"Serializing, id: %u, data size: %u\n",msg->message_id,msg->size);
 	target[0] = '$';
 	target[1] = 'M';
@@ -64,6 +82,7 @@ uint8_t msg_parse(struct S_MSG *target, const uint8_t *buf, uint8_t buf_len) {
 				if (j==target->size) state++;
 				break;
 			case 6: //crc 
+				msg_rx_count++;
 				crc = msg_crc(target);
 				if (crc == buf[i]) state++;
 				else state+=2;					
@@ -84,7 +103,8 @@ uint8_t msg_parse(struct S_MSG *target, const uint8_t *buf, uint8_t buf_len) {
 	}
 
 	if (state==8) { //something wrong
-		dbg(DBG_MSG|DBG_ERROR,"CRC Error. Expected: %02x, calculated: %02x. Consumed bytes: %u\n",buf[i],crc,i);
+		dbg(DBG_MSG|DBG_WARNING,"CRC Error. Expected: %02x, calculated: %02x. Consumed bytes: %u\n",buf[i],crc,i);
+		crc_error++;
 		target->message_id = 0;
 		return i;
 	}
