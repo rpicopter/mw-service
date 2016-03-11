@@ -11,7 +11,7 @@ mw_CFLAGS = -Wall
 mw_LDFLAGS =  
 mw_LDADD = -lmw_core -lrt -lpthread
 
-mwcli_SOURCES = mwcli.c msp.c endian.c routines.c 
-mwcli_CFLAGS = -Wall
-mwcli_LDFLAGS = 
-mwcli_LDADD = -lmw_core -lrt -lpthread
+mwtest_SOURCES = mwtest.c msp.c endian.c routines.c 
+mwtest_CFLAGS = -Wall
+mwtest_LDFLAGS = 
+mwtest_LDADD = -lmw_core -lrt -lpthread
