@@ -3,6 +3,7 @@
 #include "shm.h"
 #include "msp.h"
 #include "uart.h"
+#include "gpio.h"
 #include "routines.h"
 
 #include <stdio.h>
@@ -19,6 +20,7 @@ uint8_t stop = 0;
 char uart_path[255] = "/dev/ttyUSB0";
 uint8_t background = 0;
 uint8_t verbosity = 0b11111111;
+uint8_t reset_pin = 25;
 
 struct timespec current_time;
 
@@ -34,15 +36,17 @@ void print_usage() {
 	printf("-b\trun in background [defaults: %u]\n",background);
 	printf("-v\tverbosity flag [defaults: %u]\n",verbosity);
 	printf("-u\tuart device path [defaults: %s]\n",uart_path);
+	printf("-p\tgpio to use for resetting mw [defaults: %u]\n",reset_pin);
 }
 
 int set_defaults(int c, char **a) {
 	int option;
-	while ((option = getopt(c, a,"hbv:u:")) != -1) {
+	while ((option = getopt(c, a,"hbv:u:p:")) != -1) {
 		switch (option)  {
 			case 'b': background = 1;  break;
 			case 'v': verbosity = atoi(optarg); break;
 			case 'u': strcpy(uart_path,optarg); break;
+			case 'p': reset_pin = atoi(optarg); break;
 			default:
 				print_usage();
 				return -1;
@@ -53,6 +57,7 @@ int set_defaults(int c, char **a) {
 } 
 
 void get_local_status(struct S_MSG *msg) {
+	dbg(DBG_VERBOSE|DBG_MW,"Getting local status\n");
 	uint16_t x;
 	uint8_t buf[16];
 
@@ -64,6 +69,15 @@ void get_local_status(struct S_MSG *msg) {
 	memcpy(buf+4,&x,2);
 
 	msp_custom(msg,50,buf,6);
+}
+
+void reset_mw() {
+	dbg(DBG_VERBOSE|DBG_MW,"Resetting mw on GPIO %u\n",reset_pin);
+	gpio_export(reset_pin);
+	gpio_set_value(reset_pin,GPIO_HIGH);
+	mssleep(1000);
+	gpio_set_value(reset_pin,GPIO_LOW);
+	gpio_unexport(reset_pin);
 }
 
 int main (int argc, char **argv)
@@ -157,6 +171,9 @@ int main (int argc, char **argv)
 					case 50: //this is our custom status message
 						get_local_status(&msg);
 						shm_put_incoming(&msg);
+						break;
+					case 51: 
+						reset_mw();
 						break;
 					default: //add message to buffer for sending later
 						bufout_end += msg_serialize(bufout+bufout_end,&msg);
