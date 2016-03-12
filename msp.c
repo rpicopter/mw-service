@@ -163,10 +163,24 @@ void msp_SET_BOX(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
 	target->size = 2*j;
 }
 
+/* USER DEFINED MESSAGES */
+void msp_STICKCOMBO(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_STICKCOMBO\n");
+	target->message_id = 52;
+	target->size = 1;
+	target->data[0] = stickcombo->combo;
+}
+
+void msp_parse_STICKCOMBO(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *msg) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_STICKCOMBO\n");
+	stickcombo->combo = msg->data[0];
+}
+
 void msp_custom(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing custom message: %u\n",id);
 	target->message_id = id;
 	target->size = length;
 	memcpy(target->data,data,length);
 }
+
 

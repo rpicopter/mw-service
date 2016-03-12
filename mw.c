@@ -22,7 +22,14 @@ uint8_t background = 0;
 uint8_t verbosity = 0b11111111;
 uint8_t reset_pin = 25;
 
+uint8_t action = 0; //determines if we are just forwarding or performing a user requested action
+uint8_t action_sleep = 0;
+
 struct timespec current_time;
+
+static struct S_MSG action_msg;
+void set_action_msg(struct S_MSG *msg);
+uint8_t get_action_msg(struct S_MSG *msg);
 
 void catch_signal(int sig)
 {
@@ -80,6 +87,62 @@ void reset_mw() {
 	gpio_unexport(reset_pin);
 }
 
+void request_stick(struct S_MSP_RC *rc, uint16_t thr, uint16_t yaw, uint16_t pit, uint16_t rol) {
+	rc->aux1=rc->aux2=rc->aux3=rc->aux4 = RC_CE;
+	rc->throttle = thr;
+	rc->yaw = yaw;
+	rc->pitch = pit;
+	rc->roll = rol;
+}
+
+void process_stickcombo(struct S_MSG *msg) {
+	struct S_MSP_STICKCOMBO sc;
+	struct S_MSP_RC rc;
+	struct S_MSG target;	
+
+	msp_parse_STICKCOMBO(&sc,msg);
+
+	switch (sc.combo) {
+		case STICKARM: request_stick(&rc,RC_LO,RC_HI,RC_CE,RC_CE); break;
+		case STICKDISARM: request_stick(&rc,RC_LO,RC_LO,RC_CE,RC_CE); break;
+		case STICKGYROCALIB: request_stick(&rc,RC_LO,RC_LO,RC_LO,RC_CE); break;
+		case STICKACCCALIB: request_stick(&rc,RC_HI,RC_LO,RC_LO,RC_CE); break;
+		case STICKMAGCALIB: request_stick(&rc,RC_HI,RC_HI,RC_LO,RC_CE); break;
+	}
+
+
+	msp_SET_RAW_RC(&target,&rc);
+	set_action_msg(&target);
+
+	action = 1;
+	action_sleep = 150; //this action will take 150*loop_cycle = 1.5s (loop @ 10ms)
+}
+
+uint8_t get_action_msg(struct S_MSG *msg) {
+	if (!action_msg.message_id || !action) return 0;
+
+	memcpy(msg,&action_msg,sizeof(struct S_MSG));
+	return 1;
+}
+
+void set_action_msg(struct S_MSG *msg) {
+	if (!msg) action_msg.message_id = 0;
+	else memcpy(&action_msg,msg,sizeof(struct S_MSG));
+}
+
+void do_actions() {
+	if (!action) return;
+
+	if (action_sleep) {
+		action_sleep--;
+		return;
+	}
+
+	if (action==1) {
+		action = 0;
+	}
+}
+
 int main (int argc, char **argv)
 {
 
@@ -133,6 +196,8 @@ int main (int argc, char **argv)
 
         ret = select(fd+1, &rlist, &wlist, &elist, &tv);
 
+        if (action) do_actions();
+
         if (FD_ISSET(fd, &elist)) {
             dbg(DBG_MW|DBG_ERROR,"Exception\n");
             break;
@@ -142,7 +207,7 @@ int main (int argc, char **argv)
             dbg(DBG_MW|DBG_ERROR,"Select exception: %s\n",strerror(errno));
             stop = 1;
             break;
-        }  
+        } 
 
         if (FD_ISSET(fd, &wlist)) {
 			i=uart_write(bufout+bufout_start,bufout_end-bufout_start);
@@ -165,8 +230,9 @@ int main (int argc, char **argv)
 
         ret = 1; 
         while (ret && (BUFFER_SIZE-bufout_end>MSG_MAX_DATA_LEN)) { //if we have space in buffer
-			ret = shm_scan_outgoing(&msg); 
-			if (ret==1) {
+			if (action) ret = get_action_msg(&msg); //check if we are running an action
+			else ret = shm_scan_outgoing(&msg); //otherwise process the shm
+			if (ret==1) { 
 				switch (msg.message_id)	{
 					case 50: //this is our custom status message
 						get_local_status(&msg);
@@ -174,6 +240,9 @@ int main (int argc, char **argv)
 						break;
 					case 51: 
 						reset_mw();
+						break;
+					case 52: //request stick combo
+						process_stickcombo(&msg);
 						break;
 					default: //add message to buffer for sending later
 						bufout_end += msg_serialize(bufout+bufout_end,&msg);

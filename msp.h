@@ -5,6 +5,10 @@
 #include "msg.h"
 
 
+#define RC_LO 1100-1 //used for stick combos; based on MultiWii.h
+#define RC_HI 1900+1
+#define RC_CE 1500
+
 struct S_MSP_IDENT {
 	uint8_t version;
 	uint8_t multitype;
@@ -80,6 +84,17 @@ struct S_MSP_BOXCONFIG {
 	uint16_t active[CHECKBOXITEMS];
 };
 
+enum stick {
+	STICKARM,
+	STICKDISARM,
+	STICKGYROCALIB,
+	STICKACCCALIB,
+	STICKMAGCALIB	
+};
+
+struct S_MSP_STICKCOMBO {
+	uint8_t combo;
+};
 
 
 void msp_IDENT(struct S_MSG *target);
@@ -106,7 +121,12 @@ void msp_parse_BOX(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg);
 
 void msp_SET_BOX(struct S_MSG *target, struct S_MSP_BOXCONFIG *box);
 
+/* USER DEFINED MESSAGES */
+void msp_STICKCOMBO(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo);
+void msp_parse_STICKCOMBO(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *msg);
+
 void msp_custom(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length);
+
 
 #endif
 
