@@ -63,6 +63,10 @@
 #define MSP_DEBUGMSG             253   //out message         debug string buffer
 #define MSP_DEBUG                254   //out message         debug1,debug2,debug3,debug4
 
+
+#define MSP_LOCALSTATUS 		50
+#define MSP_STICKCOMBO 			52
+
 struct S_MSP_IDENT {
 	uint8_t version;
 	uint8_t multitype;

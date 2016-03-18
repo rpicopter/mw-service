@@ -149,7 +149,6 @@ int main (int argc, char **argv)
 	uint8_t bufout[BUFFER_SIZE];
 	uint8_t bufout_start=0,bufout_end=0;
 
-
 	int i,ret;
 
 	//,ret,buf_ptr = 0;

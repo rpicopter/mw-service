@@ -88,6 +88,10 @@ void mspmsg_RC_create(struct S_MSG *target) {
 
 void mspmsg_SET_RAW_RC_create(struct S_MSG *target, struct S_MSP_RC *rc) {
 	    target->message_id = 200;
+		if (rc==NULL) {
+			target->size = 0;
+			return;
+		}	    
         target->size = 16;
         memcpy(target->data,reverse16(&rc->roll),2);
         memcpy(target->data+2,reverse16(&rc->pitch),2);
@@ -157,6 +161,11 @@ void mspmsg_SET_BOX_create(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
 	uint8_t i,j = 0;
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SET_BOX\n");
     target->message_id = 203;
+	if (box==NULL) {
+		target->size = 0;
+		return;
+	}
+
     dbg(DBG_MSP|DBG_VERBOSE,"Setting box config: ");
 	for (i=0;i<CHECKBOXITEMS;i++) {
 		if (box->supported[i]) {
@@ -172,6 +181,10 @@ void mspmsg_SET_BOX_create(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
 void mspmsg_STICKCOMBO_create(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_STICKCOMBO\n");
 	target->message_id = 52;
+	if (stickcombo==NULL) {
+		target->size = 0;
+		return;
+	}
 	target->size = 1;
 	target->data[0] = stickcombo->combo;
 }
@@ -184,6 +197,10 @@ void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *
 void mspmsg_LOCALSTATUS_create(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_LOCALSTATUS\n");
 	target->message_id = 50;
+	if (status==NULL) {
+		target->size = 0;
+		return;
+	}
 	target->size = 6;
 
 	//we are communicating with the mw-service hence no need to reverse byte order
