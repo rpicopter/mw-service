@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include "debug.h"
 
+
+#define get_bit(n,k) (n & ( 1 << k )) >> k
+
 #define MSG_MAX_DATA_LEN 32 //the maximum length of a data in a MSP protocol (padded)
 
 struct S_MSG {

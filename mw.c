@@ -65,17 +65,13 @@ int set_defaults(int c, char **a) {
 
 void get_local_status(struct S_MSG *msg) {
 	dbg(DBG_VERBOSE|DBG_MW,"Getting local status\n");
-	uint16_t x;
-	uint8_t buf[16];
+	struct S_MSP_LOCALSTATUS status;
 
-	x = msg_get_crc_error_count();
-	memcpy(buf,&x,2);
-	x = msg_get_rx_count();
-	memcpy(buf+2,&x,2);
-	x = msg_get_tx_count();
-	memcpy(buf+4,&x,2);
+	status.crc_error_count = msg_get_crc_error_count();
+	status.rx_count = msg_get_rx_count();
+	status.rx_count = msg_get_tx_count();
 
-	mspmsg_custom_create(msg,50,buf,6);
+	mspmsg_LOCALSTATUS_create(msg,&status);
 }
 
 void reset_mw() {

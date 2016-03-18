@@ -3,10 +3,6 @@
 #include <string.h>
 #include "endian.h"
 
-
-
-#define get_bit(n,k) (n & ( 1 << k )) >> k
-
 uint8_t msp_is_armed(struct S_MSP_STATUS *status) {
 	//the arm flag is the very last bit
 	return get_bit(status->flag,0); 
@@ -183,6 +179,24 @@ void mspmsg_STICKCOMBO_create(struct S_MSG *target, struct S_MSP_STICKCOMBO *sti
 void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_STICKCOMBO\n");
 	stickcombo->combo = msg->data[0];
+}
+
+void mspmsg_LOCALSTATUS_create(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_LOCALSTATUS\n");
+	target->message_id = 50;
+	target->size = 6;
+
+	//we are communicating with the mw-service hence no need to reverse byte order
+	memcpy(target->data,&status->crc_error_count,2);
+	memcpy(target->data+2,&status->rx_count,2);
+	memcpy(target->data+4,&status->tx_count,2);
+}
+
+void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *msg) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_LOCALSTATUS\n");
+	memcpy(&status->crc_error_count,msg->data,2);
+	memcpy(&status->rx_count,msg->data+2,2);
+	memcpy(&status->tx_count,msg->data+4,2);
 }
 
 void mspmsg_custom_create(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length) {

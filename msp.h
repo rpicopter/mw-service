@@ -176,6 +176,11 @@ struct S_MSP_STICKCOMBO {
 	uint8_t combo;
 };
 
+struct S_MSP_LOCALSTATUS {
+	uint16_t crc_error_count; //on receiving end	
+	uint16_t rx_count;
+	uint16_t tx_count;
+};
 
 /* Gets arm status for the quadcopter based on flag in status message */
 uint8_t msp_is_armed(struct S_MSP_STATUS *status);
@@ -213,6 +218,9 @@ void mspmsg_SET_BOX_create(struct S_MSG *target, struct S_MSP_BOXCONFIG *box); /
 /* USER DEFINED MESSAGES */
 void mspmsg_STICKCOMBO_create(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo);
 void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *msg);
+
+void mspmsg_LOCALSTATUS_create(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status);
+void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *msg);
 
 void mspmsg_custom_create(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length);
 
