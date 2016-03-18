@@ -75,7 +75,7 @@ void get_local_status(struct S_MSG *msg) {
 	x = msg_get_tx_count();
 	memcpy(buf+4,&x,2);
 
-	msp_custom(msg,50,buf,6);
+	mspmsg_custom_create(msg,50,buf,6);
 }
 
 void reset_mw() {
@@ -100,7 +100,7 @@ void process_stickcombo(struct S_MSG *msg) {
 	struct S_MSP_RC rc;
 	struct S_MSG target;	
 
-	msp_parse_STICKCOMBO(&sc,msg);
+	mspmsg_STICKCOMBO_parse(&sc,msg);
 
 	switch (sc.combo) {
 		case STICKARM: request_stick(&rc,RC_LO,RC_HI,RC_CE,RC_CE); break;
@@ -111,7 +111,7 @@ void process_stickcombo(struct S_MSG *msg) {
 	}
 
 
-	msp_SET_RAW_RC(&target,&rc);
+	mspmsg_SET_RAW_RC_create(&target,&rc);
 	set_action_msg(&target);
 
 	action = 1;

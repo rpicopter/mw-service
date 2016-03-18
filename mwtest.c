@@ -62,11 +62,11 @@ void listen() {
 			msg_counter++;
 			switch (msg.message_id) {
 				case 100: 
-					msp_parse_IDENT(&ident,&msg);  
+					mspmsg_IDENT_parse(&ident,&msg);  
 					//ident now contains the retrieved MSP_IDENT message
 				break;
 				case 101: 
-					msp_parse_STATUS(&status,&msg); 
+					mspmsg_STATUS_parse(&status,&msg); 
 					//status now contains the retrieved MSP_STATUS message
 				break;
 			}
@@ -95,10 +95,10 @@ int main (int argc, char **argv)
 
 	if (shm_client_init()) return -1; //initiate channel to mw-service
 
-	msp_IDENT(&msg); //prepare MSP_IDENT message
+	mspmsg_IDENT_create(&msg); //prepare MSP_IDENT message
 	shm_put_outgoing(&msg); //send it to the service
 
-	msp_STATUS(&msg); //preparing MSP_STATUS message
+	mspmsg_STATUS_create(&msg); //preparing MSP_STATUS message
 	shm_put_outgoing(&msg); //send it to the service
 
 	//run loop
