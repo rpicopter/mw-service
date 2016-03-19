@@ -69,7 +69,7 @@ void get_local_status(struct S_MSG *msg) {
 
 	status.crc_error_count = msg_get_crc_error_count();
 	status.rx_count = msg_get_rx_count();
-	status.rx_count = msg_get_tx_count();
+	status.tx_count = msg_get_tx_count();
 
 	mspmsg_LOCALSTATUS_create(msg,&status);
 }
