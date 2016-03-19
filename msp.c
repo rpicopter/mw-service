@@ -3,6 +3,28 @@
 #include <string.h>
 #include "endian.h"
 
+const char pidnames[] =
+  "ROLL;"
+  "PITCH;"
+  "YAW;"
+  "ALT;"
+  "Pos;"
+  "PosR;"
+  "NavR;"
+  "LEVEL;"
+  "MAG;"
+  "VEL;"
+;
+
+
+uint8_t msp_get_pid_count() {
+	return 10;
+}
+
+char* msp_get_pidname(uint8_t pid) {
+	return pidnames[pid];
+}
+
 uint8_t msp_is_armed(struct S_MSP_STATUS *status) {
 	//the arm flag is the very last bit
 	return get_bit(status->flag,0); 
@@ -10,10 +32,11 @@ uint8_t msp_is_armed(struct S_MSP_STATUS *status) {
 }
 
 /* constructors and parsers for all messages */
-void mspmsg_IDENT_create(struct S_MSG *target) {
+void mspmsg_IDENT_serialize(struct S_MSG *target, struct S_MSP_IDENT *src) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_IDENT\n");
-	target->message_id = 100;
+	target->message_id = MSP_IDENT;
 	target->size = 0;
+	//TODO: data
 }
 
 void mspmsg_IDENT_parse(struct S_MSP_IDENT *ident, struct S_MSG *msg) {
@@ -27,10 +50,11 @@ void mspmsg_IDENT_parse(struct S_MSP_IDENT *ident, struct S_MSG *msg) {
 }
 
 
-void mspmsg_STATUS_create(struct S_MSG *target) {
+void mspmsg_STATUS_serialize(struct S_MSG *target, struct S_MSP_STATUS *src) {
         dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_STATUS\n");
-        target->message_id = 101;
+        target->message_id = MSP_STATUS;
         target->size = 0;
+        //TODO: data
 }
 
 void mspmsg_STATUS_parse(struct S_MSP_STATUS *status, struct S_MSG *msg) {
@@ -44,10 +68,11 @@ void mspmsg_STATUS_parse(struct S_MSP_STATUS *status, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"cycleTime: %04x, i2c_errors_count: %04x, sensor: %04x, flag: %08x, currentSet: %02x\n",status->cycleTime,status->i2c_errors_count,status->sensor,status->flag,status->currentSet);
 }
 
-void mspmsg_RAW_IMU_create(struct S_MSG *target) {
+void mspmsg_RAW_IMU_serialize(struct S_MSG *target, struct S_MSP_RAW_IMU *src) {
         dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_RAW_IMU\n");
-        target->message_id = 102;
+        target->message_id = MSP_RAW_IMU;
         target->size = 0;
+        //TODO: data
 }
 
 void mspmsg_RAW_IMU_parse(struct S_MSP_RAW_IMU *imu, struct S_MSG *msg) {
@@ -65,10 +90,11 @@ void mspmsg_RAW_IMU_parse(struct S_MSP_RAW_IMU *imu, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"AX: %04x, AY: %04x, AZ: %04x, GX: %04x, GY: %04x, GZ: %04x, MX: %04x, MY: %04x, MZ: %04x\n",imu->accx,imu->accy,imu->accz,imu->gyrx,imu->gyry,imu->gyrz,imu->magx,imu->magy,imu->magz);
 }
 
-void mspmsg_SERVO_create(struct S_MSG *target) {
+void mspmsg_SERVO_serialize(struct S_MSG *target, struct S_MSP_SERVO *src) {
         dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SERVO\n");
-        target->message_id = 103;
+        target->message_id = MSP_SERVO;
         target->size = 0;
+        //TODO: data
 }
 
 void mspmsg_SERVO_parse(struct S_MSP_SERVO *servo, struct S_MSG *msg) {
@@ -80,14 +106,15 @@ void mspmsg_SERVO_parse(struct S_MSP_SERVO *servo, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"S0: %04x, S1: %04x, S2: %04x, S3: %04x, S3: %04x, S4: %04x, S5: %04x, S6: %04x, S7: %04x\n",servo->servo[0],servo->servo[1],servo->servo[2],servo->servo[3],servo->servo[4],servo->servo[5],servo->servo[6],servo->servo[7]);
 }
 
-void mspmsg_RC_create(struct S_MSG *target) {
+void mspmsg_RC_serialize(struct S_MSG *target, struct S_MSP_RC *src) {
         dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_RC\n");
-        target->message_id = 105;
+        target->message_id = MSP_RC;
         target->size = 0;
+        //TODO: data
 }
 
-void mspmsg_SET_RAW_RC_create(struct S_MSG *target, struct S_MSP_RC *rc) {
-	    target->message_id = 200;
+void mspmsg_SET_RAW_RC_serialize(struct S_MSG *target, struct S_MSP_RC *rc) {
+	    target->message_id = MSP_SET_RAW_RC;
 		if (rc==NULL) {
 			target->size = 0;
 			return;
@@ -117,10 +144,11 @@ void mspmsg_RC_parse(struct S_MSP_RC *rc, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"R: %04x, P: %04x, Y: %04x, T: %04x, A1: %04x, A2: %04x, A3: %04x, A4: %04x\n",rc->roll,rc->pitch,rc->yaw,rc->throttle, rc->aux1, rc->aux2, rc->aux3, rc->aux4);
 }
 
-void mspmsg_BOXIDS_create(struct S_MSG *target) {
+void mspmsg_BOXIDS_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src) {
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_BOXIDS\n");
-    target->message_id = 119;
+    target->message_id = MSP_BOXIDS;
     target->size = 0;
+    //TODO: data
 }
 
 void mspmsg_BOXIDS_parse(struct S_MSP_BOXCONFIG *boxconf, struct S_MSG *msg) {
@@ -136,10 +164,11 @@ void mspmsg_BOXIDS_parse(struct S_MSP_BOXCONFIG *boxconf, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"\n");
 }
 
-void mspmsg_BOX_create(struct S_MSG *target) {
+void mspmsg_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *msg) {
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_BOX\n");
-    target->message_id = 113;
+    target->message_id = MSP_BOX;
     target->size = 0;
+    //TODO: data
 }
 
 void mspmsg_BOX_parse(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg) {
@@ -157,10 +186,10 @@ void mspmsg_BOX_parse(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"\n");
 }
 
-void mspmsg_SET_BOX_create(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
+void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
 	uint8_t i,j = 0;
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SET_BOX\n");
-    target->message_id = 203;
+    target->message_id = MSP_SET_BOX;
 	if (box==NULL) {
 		target->size = 0;
 		return;
@@ -177,10 +206,20 @@ void mspmsg_SET_BOX_create(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
 	target->size = 2*j;
 }
 
+void mspmsg_PID_serialize(struct S_MSG *target, struct S_MSP_PID *src) {
+	target->message_id = MSP_PID;
+	target->size = 0;
+	//TODO: data
+}
+
+void mspmsg_PID_parse(struct S_MSP_PIDITEMS *pid, struct S_MSG *msg) {
+
+}
+
 /* USER DEFINED MESSAGES */
-void mspmsg_STICKCOMBO_create(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo) {
+void mspmsg_STICKCOMBO_serialize(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_STICKCOMBO\n");
-	target->message_id = 52;
+	target->message_id = MSP_STICKCOMBO;
 	if (stickcombo==NULL) {
 		target->size = 0;
 		return;
@@ -194,9 +233,9 @@ void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *
 	stickcombo->combo = msg->data[0];
 }
 
-void mspmsg_LOCALSTATUS_create(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status) {
+void mspmsg_LOCALSTATUS_serialize(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_LOCALSTATUS\n");
-	target->message_id = 50;
+	target->message_id = MSP_LOCALSTATUS;
 	if (status==NULL) {
 		target->size = 0;
 		return;
@@ -216,7 +255,7 @@ void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *ms
 	memcpy(&status->tx_count,msg->data+4,2);
 }
 
-void mspmsg_custom_create(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length) {
+void mspmsg_custom_serialize(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing custom message: %u\n",id);
 	target->message_id = id;
 	target->size = length;

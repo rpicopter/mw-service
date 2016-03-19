@@ -9,6 +9,8 @@
 #define RC_HI 1900+1
 #define RC_CE 1500
 
+#define MAX_PID 10
+
 #define MSP_PRIVATE              1     //in+out message      to be used for a generic framework : MSP + function code (LIST/GET/SET) + data. no code yet
 
 #define MSP_IDENT                100   //out message         multitype + multiwii version + protocol version + capability variable
@@ -110,6 +112,16 @@ struct S_MSP_RC {
 	uint16_t aux4;	
 };
 
+struct S_MSP_PID {
+ 	uint8_t P8;
+ 	uint8_t I8;
+ 	uint8_t D8;
+};
+
+struct S_MSP_PIDITEMS {
+	struct S_MSP_PID pid[MAX_PID];
+};
+
 enum multitype {
 	MULTITYPENONE0, //0
 	MULTITYPETRI, //1
@@ -186,47 +198,52 @@ struct S_MSP_LOCALSTATUS {
 	uint16_t tx_count;
 };
 
+char* msp_get_pidname(uint8_t pid);
+uint8_t msp_get_pid_count();
 /* Gets arm status for the quadcopter based on flag in status message */
 uint8_t msp_is_armed(struct S_MSP_STATUS *status);
 
 
-/* Parsers and constructors 
+/* Parsers and serializers 
  * By default each message has a create function and a parse function
  */
-void mspmsg_IDENT_create(struct S_MSG *target); //creates a MSP_INDENT message
+void mspmsg_IDENT_serialize(struct S_MSG *target, struct S_MSP_IDENT *src); //creates a MSP_INDENT message
 void mspmsg_IDENT_parse(struct S_MSP_IDENT *target, struct S_MSG *msg); //parses msg into MSP_INDENT structure
 
-void mspmsg_STATUS_create(struct S_MSG *target); 
+void mspmsg_STATUS_serialize(struct S_MSG *target, struct S_MSP_STATUS *src); 
 void mspmsg_STATUS_parse(struct S_MSP_STATUS *status, struct S_MSG *msg);
 
-void mspmsg_RAW_IMU_create(struct S_MSG *target);
+void mspmsg_RAW_IMU_serialize(struct S_MSG *target, struct S_MSP_RAW_IMU *src);
 void mspmsg_RAW_IMU_parse(struct S_MSP_RAW_IMU *imu, struct S_MSG *msg);
 
-void mspmsg_SERVO_create(struct S_MSG *target);
+void mspmsg_SERVO_serialize(struct S_MSG *target, struct S_MSP_SERVO *src);
 void mspmsg_SERVO_parse(struct S_MSP_SERVO *servo, struct S_MSG *msg);
 
-void mspmsg_RC_create(struct S_MSG *target);
-void mspmsg_SET_RAW_RC_create(struct S_MSG *target, struct S_MSP_RC *rc);
+void mspmsg_RC_serialize(struct S_MSG *target, struct S_MSP_RC *src);
+void mspmsg_SET_RAW_RC_serialize(struct S_MSG *target, struct S_MSP_RC *rc);
 void mspmsg_RC_parse(struct S_MSP_RC *status, struct S_MSG *msg);
 
 //BOXIDS = supported boxes
-void mspmsg_BOXIDS_create(struct S_MSG *target);
+void mspmsg_BOXIDS_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src);
 void mspmsg_BOXIDS_parse(struct S_MSP_BOXCONFIG *boxconf, struct S_MSG *msg);
 
 //BOX = value for all supported boxes
-void mspmsg_BOX_create(struct S_MSG *target);
+void mspmsg_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src);
 void mspmsg_BOX_parse(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg);
 
-void mspmsg_SET_BOX_create(struct S_MSG *target, struct S_MSP_BOXCONFIG *box); //create
+void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *box); //create
+
+void mspmsg_PID_serialize(struct S_MSG *target, struct S_MSP_PID *src);
+void mspmsg_PID_parse(struct S_MSP_PIDITEMS *pid, struct S_MSG *msg);
 
 /* USER DEFINED MESSAGES */
-void mspmsg_STICKCOMBO_create(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo);
+void mspmsg_STICKCOMBO_serialize(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo);
 void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *msg);
 
-void mspmsg_LOCALSTATUS_create(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status);
+void mspmsg_LOCALSTATUS_serialize(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status);
 void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *msg);
 
-void mspmsg_custom_create(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length);
+void mspmsg_custom_serialize(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length);
 
 
 #endif

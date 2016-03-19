@@ -71,7 +71,7 @@ void get_local_status(struct S_MSG *msg) {
 	status.rx_count = msg_get_rx_count();
 	status.tx_count = msg_get_tx_count();
 
-	mspmsg_LOCALSTATUS_create(msg,&status);
+	mspmsg_LOCALSTATUS_serialize(msg,&status);
 }
 
 void reset_mw() {
@@ -107,7 +107,7 @@ void process_stickcombo(struct S_MSG *msg) {
 	}
 
 
-	mspmsg_SET_RAW_RC_create(&target,&rc);
+	mspmsg_SET_RAW_RC_serialize(&target,&rc);
 	set_action_msg(&target);
 
 	action = 1;
