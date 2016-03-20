@@ -18,11 +18,37 @@ const char pidnames[] =
 
 
 uint8_t msp_get_pid_count() {
-	return 10;
+	return MAX_PID;
 }
 
-char* msp_get_pidname(uint8_t pid) {
-	return pidnames[pid];
+uint8_t msp_get_pidid(const char *name) {
+	//tokenize the string of pid names
+	char buf[256];
+	strcpy(buf, pidnames);
+	uint8_t i;
+	char *ret;
+
+	ret = strtok(buf,";");
+	if (strcmp(name,ret)==0) return 0;
+
+	for (i=1;i<MAX_PID;i++) {
+		ret = strtok(NULL,";");
+		if (strcmp(name,ret)==0) return i;
+	}
+	
+	return 0xFF;
+}
+
+const char* msp_get_pidname(uint8_t pid) {
+	//tokenize the string of pid names
+	static char buf[256];
+	strcpy(buf, pidnames);
+	uint8_t i;
+	char *ret;
+	ret = strtok(buf,";");
+	for (i=1;i<=pid;i++)
+		ret = strtok(NULL,";");
+	return ret;
 }
 
 uint8_t msp_is_armed(struct S_MSP_STATUS *status) {
@@ -90,6 +116,38 @@ void mspmsg_RAW_IMU_parse(struct S_MSP_RAW_IMU *imu, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"AX: %04x, AY: %04x, AZ: %04x, GX: %04x, GY: %04x, GZ: %04x, MX: %04x, MY: %04x, MZ: %04x\n",imu->accx,imu->accy,imu->accz,imu->gyrx,imu->gyry,imu->gyrz,imu->magx,imu->magy,imu->magz);
 }
 
+void mspmsg_ATTITUDE_serialize(struct S_MSG *target, struct S_MSP_ATTITUDE *src) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_ATTITUDE\n");
+    target->message_id = MSP_ATTITUDE;
+    target->size = 0;
+    //TODO: data	
+}
+
+void mspmsg_ATTITUDE_parse(struct S_MSP_ATTITUDE *target, struct S_MSG *msg) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_ATTITUDE\n");
+	target->angx = *reverse16(msg->data);
+	target->angy = *reverse16(msg->data+2);
+	target->heading = *reverse16(msg->data+4);
+}
+
+void mspmsg_RAW_GPS_serialize(struct S_MSG *target, struct S_MSP_RAW_GPS *src) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_ATTITUDE\n");
+    target->message_id = MSP_RAW_GPS;
+    target->size = 0;
+    //TODO: data	
+}
+
+void mspmsg_RAW_GPS_parse(struct S_MSP_RAW_GPS *target, struct S_MSG *msg) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_RAW_GPS\n");
+	target->fix = *msg->data;
+	target->num_sat = *(msg->data+1);
+	target->lat = *reverse32(msg->data+2);
+	target->lon = *reverse32(msg->data+6);
+	target->alt = *reverse16(msg->data+10);
+	target->speed = *reverse16(msg->data+12);
+	target->ground_course = *reverse16(msg->data+14);
+}
+
 void mspmsg_SERVO_serialize(struct S_MSG *target, struct S_MSP_SERVO *src) {
         dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SERVO\n");
         target->message_id = MSP_SERVO;
@@ -113,21 +171,21 @@ void mspmsg_RC_serialize(struct S_MSG *target, struct S_MSP_RC *src) {
         //TODO: data
 }
 
-void mspmsg_SET_RAW_RC_serialize(struct S_MSG *target, struct S_MSP_RC *rc) {
+void mspmsg_SET_RAW_RC_serialize(struct S_MSG *target, struct S_MSP_RC *src) {
 	    target->message_id = MSP_SET_RAW_RC;
-		if (rc==NULL) {
+		if (src==NULL) {
 			target->size = 0;
 			return;
 		}	    
         target->size = 16;
-        memcpy(target->data,reverse16(&rc->roll),2);
-        memcpy(target->data+2,reverse16(&rc->pitch),2);
-        memcpy(target->data+4,reverse16(&rc->yaw),2);
-        memcpy(target->data+6,reverse16(&rc->throttle),2);
-        memcpy(target->data+8,reverse16(&rc->aux1),2);
-        memcpy(target->data+10,reverse16(&rc->aux2),2);
-        memcpy(target->data+12,reverse16(&rc->aux3),2);
-        memcpy(target->data+14,reverse16(&rc->aux4),2);
+        memcpy(target->data,reverse16(&src->roll),2);
+        memcpy(target->data+2,reverse16(&src->pitch),2);
+        memcpy(target->data+4,reverse16(&src->yaw),2);
+        memcpy(target->data+6,reverse16(&src->throttle),2);
+        memcpy(target->data+8,reverse16(&src->aux1),2);
+        memcpy(target->data+10,reverse16(&src->aux2),2);
+        memcpy(target->data+12,reverse16(&src->aux3),2);
+        memcpy(target->data+14,reverse16(&src->aux4),2);
 }
 
 void mspmsg_RC_parse(struct S_MSP_RC *rc, struct S_MSG *msg) {
@@ -186,46 +244,86 @@ void mspmsg_BOX_parse(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"\n");
 }
 
-void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *box) {
+void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src) {
 	uint8_t i,j = 0;
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SET_BOX\n");
     target->message_id = MSP_SET_BOX;
-	if (box==NULL) {
+	if (src==NULL) {
 		target->size = 0;
 		return;
 	}
 
     dbg(DBG_MSP|DBG_VERBOSE,"Setting box config: ");
 	for (i=0;i<CHECKBOXITEMS;i++) {
-		if (box->supported[i]) {
-			memcpy(target->data+(j*2),reverse16(&box->active[i]),2);
-			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,box->active[i]);
+		if (src->supported[i]) {
+			memcpy(target->data+(j*2),reverse16(&src->active[i]),2);
+			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,src->active[i]);
 			j++;
 		}
 	}
 	target->size = 2*j;
 }
 
-void mspmsg_PID_serialize(struct S_MSG *target, struct S_MSP_PID *src) {
+void mspmsg_PID_serialize(struct S_MSG *target, struct S_MSP_PIDITEMS *src) {
+	uint8_t i;
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_PID\n");
 	target->message_id = MSP_PID;
-	target->size = 0;
-	//TODO: data
-}
-
-void mspmsg_PID_parse(struct S_MSP_PIDITEMS *pid, struct S_MSG *msg) {
-
-}
-
-/* USER DEFINED MESSAGES */
-void mspmsg_STICKCOMBO_serialize(struct S_MSG *target, struct S_MSP_STICKCOMBO *stickcombo) {
-	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_STICKCOMBO\n");
-	target->message_id = MSP_STICKCOMBO;
-	if (stickcombo==NULL) {
+	
+	if (src==NULL) {
 		target->size = 0;
 		return;
 	}
+
+	for (i=0;i<MAX_PID;i++)	{
+		target->data[i*3] = src->pid[i].P8;
+		target->data[i*3+1] = src->pid[i].I8;
+		target->data[i*3+2] = src->pid[i].D8;
+	}
+
+	target->size = MAX_PID*3;
+}
+
+
+void mspmsg_PID_parse(struct S_MSP_PIDITEMS *piditems, struct S_MSG *msg) {
+	uint8_t i;
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_PID\n");
+	for (i=0;i<MAX_PID;i++)	{
+		piditems->pid[i].P8 = msg->data[i*3];
+		piditems->pid[i].I8 = msg->data[i*3+1];
+		piditems->pid[i].D8 = msg->data[i*3+2];
+	}
+}
+
+void mspmsg_SET_PID_serialize(struct S_MSG *target, struct S_MSP_PIDITEMS *src) {
+	uint8_t i;
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SET_PID\n");
+	target->message_id = MSP_SET_PID;
+	
+	if (src==NULL) {
+		target->size = 0;
+		return;
+	}
+
+	for (i=0;i<MAX_PID;i++)	{
+		target->data[i*3] = src->pid[i].P8;
+		target->data[i*3+1] = src->pid[i].I8;
+		target->data[i*3+2] = src->pid[i].D8;
+	}
+
+	target->size = MAX_PID*3;
+}
+
+/* USER DEFINED MESSAGES */
+void mspmsg_STICKCOMBO_serialize(struct S_MSG *target, struct S_MSP_STICKCOMBO *src) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_STICKCOMBO\n");
+	target->message_id = MSP_STICKCOMBO;
+	if (src==NULL) {
+		target->size = 0;
+		return;
+	}
+
+	target->data[0] = src->combo;
 	target->size = 1;
-	target->data[0] = stickcombo->combo;
 }
 
 void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *msg) {
@@ -233,19 +331,20 @@ void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *
 	stickcombo->combo = msg->data[0];
 }
 
-void mspmsg_LOCALSTATUS_serialize(struct S_MSG *target, struct S_MSP_LOCALSTATUS *status) {
+void mspmsg_LOCALSTATUS_serialize(struct S_MSG *target, struct S_MSP_LOCALSTATUS *src) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_LOCALSTATUS\n");
 	target->message_id = MSP_LOCALSTATUS;
-	if (status==NULL) {
+	if (src==NULL) {
 		target->size = 0;
 		return;
 	}
-	target->size = 6;
 
 	//we are communicating with the mw-service hence no need to reverse byte order
-	memcpy(target->data,&status->crc_error_count,2);
-	memcpy(target->data+2,&status->rx_count,2);
-	memcpy(target->data+4,&status->tx_count,2);
+	memcpy(target->data,&src->crc_error_count,2);
+	memcpy(target->data+2,&src->rx_count,2);
+	memcpy(target->data+4,&src->tx_count,2);
+
+	target->size = 6;
 }
 
 void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *msg) {
