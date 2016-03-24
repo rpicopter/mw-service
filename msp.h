@@ -217,6 +217,12 @@ struct S_MSP_LOCALSTATUS {
 const char* msp_get_pidname(uint8_t pid);
 uint8_t msp_get_pidid(const char *name);
 uint8_t msp_get_pid_count();
+
+const char* msp_get_boxname(uint8_t num);
+uint8_t msp_get_boxid(const char *name);
+uint8_t msp_get_box_count();
+
+
 /* Gets arm status for the quadcopter based on flag in status message */
 uint8_t msp_is_armed(struct S_MSP_STATUS *status);
 

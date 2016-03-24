@@ -16,7 +16,6 @@
 #define DBG_VERBOSE  0b00000100
 
 
-
 void dbg_init(uint8_t caps);
 void dbg(uint8_t mask, const char *format, ...);
 char *dbg_printHEX(const uint8_t *s, int len);

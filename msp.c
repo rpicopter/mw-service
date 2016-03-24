@@ -16,6 +16,31 @@ const char pidnames[] =
   "VEL;"
 ;
 
+const char boxnames[] = 
+  "ARM;"
+  "ANGLE;"
+  "HORIZON;"
+  "BARO;"
+  "VARIO;"
+  "MAG;"
+  "HEADFREE;"
+  "HEADADJ;"  
+  "CAMSTAB;"
+  "CAMTRIG;"
+  "GPS HOME;"
+  "GPS HOLD;"
+  "PASSTHRU;"
+  "BEEPER;"
+  "LEDMAX;"
+  "LEDLOW;"
+  "LLIGHTS;"
+  "CALIB;"
+  "GOVERNOR;"
+  "OSD SW;"
+  "MISSION;"
+  "LAND;"
+ ;
+
 
 uint8_t msp_get_pid_count() {
 	return MAX_PID;
@@ -36,7 +61,7 @@ uint8_t msp_get_pidid(const char *name) {
 		if (strcmp(name,ret)==0) return i;
 	}
 	
-	return 0xFF;
+	return UINT8_MAX;
 }
 
 const char* msp_get_pidname(uint8_t pid) {
@@ -49,6 +74,40 @@ const char* msp_get_pidname(uint8_t pid) {
 	for (i=1;i<=pid;i++)
 		ret = strtok(NULL,";");
 	return ret;
+}
+
+uint8_t msp_get_box_count() {
+	return CHECKBOXITEMS;
+}
+
+const char* msp_get_boxname(uint8_t box) {
+	//tokenize the string of pid names
+	static char buf[256];
+	strcpy(buf, boxnames);
+	uint8_t i;
+	char *ret;
+	ret = strtok(buf,";");
+	for (i=1;i<=box;i++)
+		ret = strtok(NULL,";");
+	return ret;
+}
+
+uint8_t msp_get_boxid(const char *name) {
+	//tokenize the string of pid names
+	char buf[256];
+	strcpy(buf, boxnames);
+	uint8_t i;
+	char *ret;
+
+	ret = strtok(buf,";");
+	if (strcmp(name,ret)==0) return 0;
+
+	for (i=1;i<CHECKBOXITEMS;i++) {
+		ret = strtok(NULL,";");
+		if (strcmp(name,ret)==0) return i;
+	}
+	
+	return UINT8_MAX;	
 }
 
 uint8_t msp_is_armed(struct S_MSP_STATUS *status) {
