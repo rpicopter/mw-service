@@ -11,6 +11,8 @@
 
 #define MAX_PID 10
 
+#define MSP_MAX_SIZE 36
+
 #define MSP_PRIVATE              1     //in+out message      to be used for a generic framework : MSP + function code (LIST/GET/SET) + data. no code yet
 
 #define MSP_IDENT                100   //out message         multitype + multiwii version + protocol version + capability variable
@@ -66,8 +68,13 @@
 #define MSP_DEBUG                254   //out message         debug1,debug2,debug3,debug4
 
 
-#define MSP_LOCALSTATUS 		50
+//50-74 custom messages that 
+#define MSP_LOCALSTATUS  		50
+//51 reserved for MultiWii reset
 #define MSP_STICKCOMBO 			52
+
+//75-99 memory allocation for local processes
+#define MSP_HOST_WIFI   		75
 
 struct S_MSP_IDENT {
 	uint8_t version;
@@ -209,10 +216,17 @@ struct S_MSP_STICKCOMBO {
 };
 
 struct S_MSP_LOCALSTATUS {
-	uint16_t crc_error_count; //on receiving end	
+	uint16_t crc_error_count; //uart; on receiving end
 	uint16_t rx_count;
 	uint16_t tx_count;
+	int8_t rssi;
 };
+
+struct S_MSP_HOST_WIFI {
+	int8_t rssi;
+	int8_t noise;
+};
+
 
 const char* msp_get_pidname(uint8_t pid);
 uint8_t msp_get_pidid(const char *name);
@@ -273,6 +287,9 @@ void mspmsg_STICKCOMBO_parse(struct S_MSP_STICKCOMBO *stickcombo, struct S_MSG *
 
 void mspmsg_LOCALSTATUS_serialize(struct S_MSG *target, struct S_MSP_LOCALSTATUS *src);
 void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *msg);
+
+void mspmsg_HOST_WIFI_parse(struct S_MSP_HOST_WIFI *status, struct S_MSG *msg);
+void mspmsg_HOST_WIFI_serialize(struct S_MSG *target, struct S_MSP_HOST_WIFI *src);
 
 void mspmsg_custom_serialize(struct S_MSG *target, uint8_t id, uint8_t *data, uint8_t length);
 

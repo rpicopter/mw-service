@@ -120,13 +120,13 @@ uint8_t shm_client_init() {
 	}
 
 
-	fd_in = shm_open("/mw-incoming", O_RDONLY, 0666);
+	fd_in = shm_open("/mw-incoming",O_RDWR, 0666);
 	if (fd_in == -1) {
 		dbg(DBG_SHM|DBG_ERROR,"incoming shm_open %s\n",strerror(errno));
 		return 3;
 	}
 
-	block_in = mmap(NULL, sizeof(struct S_SHM_BLOCK), PROT_READ, MAP_SHARED,fd_in,0);
+	block_in = mmap(NULL, sizeof(struct S_SHM_BLOCK), PROT_READ|PROT_WRITE, MAP_SHARED,fd_in,0);
 	if (block_in == MAP_FAILED) {
 		dbg(DBG_SHM|DBG_ERROR,"incoming mmap %s\n",strerror(errno));
 		return 4;

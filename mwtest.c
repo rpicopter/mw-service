@@ -93,7 +93,10 @@ int main (int argc, char **argv)
 
 	dbg_init(verbosity);
 
-	if (shm_client_init()) return -1; //initiate channel to mw-service
+	if (shm_client_init()) {
+		perror("Error initializing");
+		return -1; //initiate channel to mw-service
+	}
 
 	mspmsg_IDENT_serialize(&msg,NULL); //prepare MSP_IDENT message
 	shm_put_outgoing(&msg); //send it to the service

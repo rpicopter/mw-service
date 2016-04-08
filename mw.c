@@ -63,13 +63,27 @@ int set_defaults(int c, char **a) {
 	return 0;
 } 
 
+void get_wifi_status(struct S_MSP_HOST_WIFI *t) {
+	struct S_MSG m;
+
+	shm_get_incoming(&m,MSP_HOST_WIFI);
+
+	mspmsg_HOST_WIFI_parse(t, &m);
+}
+
 void get_local_status(struct S_MSG *msg) {
-	dbg(DBG_VERBOSE|DBG_MW,"Getting local status\n");
+
+	struct S_MSP_HOST_WIFI wifi;
+
+	dbg(DBG_VERBOSE|DBG_MW,"Getting uart status\n");
+
 	struct S_MSP_LOCALSTATUS status;
 
+	get_wifi_status(&wifi);
 	status.crc_error_count = msg_get_crc_error_count();
 	status.rx_count = msg_get_rx_count();
 	status.tx_count = msg_get_tx_count();
+	status.rssi = wifi.rssi;
 
 	mspmsg_LOCALSTATUS_serialize(msg,&status);
 }
@@ -166,8 +180,10 @@ int main (int argc, char **argv)
 	signal(SIGTERM, catch_signal);
 	signal(SIGINT, catch_signal);
 
-
-	if (shm_server_init()) return -1;
+	if (shm_server_init()) {
+		perror("Error initializing");
+		return -1; //initiate channel to mw-service
+	}
 
 	fd = uart_init(uart_path);
 
@@ -229,14 +245,14 @@ int main (int argc, char **argv)
 			else ret = shm_scan_outgoing(&msg); //otherwise process the shm
 			if (ret==1) { 
 				switch (msg.message_id)	{
-					case 50: //this is our custom status message
+					case MSP_LOCALSTATUS: //this is our custom status message
 						get_local_status(&msg);
 						shm_put_incoming(&msg);
 						break;
 					case 51: 
 						reset_mw();
 						break;
-					case 52: //request stick combo
+					case MSP_STICKCOMBO: //request stick combo
 						process_stickcombo(&msg);
 						break;
 					default: //add message to buffer for sending later
