@@ -71,7 +71,7 @@ int main (int argc, char **argv)
 
 	mspmsg_custom_serialize(&msg,msg_id,data,data_len);
 
-	printf("MsgID: %u, data length: %u\n",msg_id,data_len);
+	if (verbosity) printf("MsgID: %u, data length: %u\n",msg_id,data_len);
 	if (block==0) shm_put_outgoing(&msg); //send it to the service
 	else shm_put_incoming(&msg); //send it to the service
 
