@@ -6,10 +6,17 @@ libmw_core_includedir = $(includedir)/mw
 libmw_core_include_HEADERS = debug.h shm.h msg.h msp.h endian.h
 
 bin_PROGRAMS = mw mwtest mwcli
+
 mw_SOURCES = mw.c routines.c uart.c gpio.c
 mw_CFLAGS = -Wall
 mw_LDFLAGS =  
 mw_LDADD = -lmw_core -lrt -lpthread
+
+mwconfdir=$(sysconfdir)/mw 
+mwconf_DATA = utils/mw-service.start utils/mw-wifi-status.start
+
+mwbindir=$(bindir)
+mwbin_DATA = utils/mw-wifi-status.sh
 
 mwtest_SOURCES = mwtest.c msp.c endian.c routines.c 
 mwtest_CFLAGS = -Wall
@@ -20,3 +27,5 @@ mwcli_SOURCES = mwcli.c msp.c endian.c routines.c
 mwcli_CFLAGS = -Wall
 mwcli_LDFLAGS = 
 mwcli_LDADD = -lmw_core -lrt -lpthread
+
+

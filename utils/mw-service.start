@@ -1,0 +1,3 @@
+MultiWii service
+mw
+-v 251 -u /dev/ttyAMA0 >> /tmp/mw.log 2>&1
