@@ -12,11 +12,8 @@ mw_CFLAGS = -Wall
 mw_LDFLAGS =  
 mw_LDADD = -lmw_core -lrt -lpthread
 
-mwconfdir=$(sysconfdir)/mw 
-mwconf_DATA = utils/mw-service.start utils/mw-wifi-status.start
-
 mwbindir=$(bindir)
-mwbin_DATA = utils/mw-wifi-status.sh
+mwbin_SCRIPTS = utils/mw-wifi-status.sh
 
 mwtest_SOURCES = mwtest.c msp.c endian.c routines.c 
 mwtest_CFLAGS = -Wall
@@ -28,4 +25,12 @@ mwcli_CFLAGS = -Wall
 mwcli_LDFLAGS = 
 mwcli_LDADD = -lmw_core -lrt -lpthread
 
+mwconfdir=$(sysconfdir)/mw
+
+install-exec-hook:
+	mkdir -p $(mwconfdir)
+	cp utils/mw-service.start $(mwconfdir)/
+	cp utils/mw-wifi-status.start $(mwconfdir)/
+	chmod 666 $(mwconfdir)/mw-service.start
+	chmod 666 $(mwconfdir)/mw-wifi-status.start
 
