@@ -1,7 +1,9 @@
 # MW
 
-This is a MultiWii service for *nix systems.
+For general information about this project see:
+https://raw.githubusercontent.com/rpicopter/mw-config/master/README
 
+This is a MultiWii service for *nix systems.
 It consists of two modules - MultiWii service (mw) and a test client - command line interface (mwtest). It is designed to run on SoC such as Raspberry Pi, BeagleBone, Odroid, etc. but will also run on variety of other systems.
 
 === BACKGROUND ===
@@ -20,7 +22,7 @@ Ensure you have:
 - automake
 
 Run ./autogen.sh (you will need automake for this to run)
-Run make
+Run make & make install
 
 === SERVICE USAGE (mw) ===
 The service is a system wide application that connects to MultiWii controller over UART:
