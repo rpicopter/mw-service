@@ -84,6 +84,7 @@ void get_local_status(struct S_MSG *msg) {
 	status.rx_count = msg_get_rx_count();
 	status.tx_count = msg_get_tx_count();
 	status.rssi = wifi.rssi;
+	status.noise = wifi.noise;
 
 	mspmsg_LOCALSTATUS_serialize(msg,&status);
 }

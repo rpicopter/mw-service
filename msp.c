@@ -403,8 +403,9 @@ void mspmsg_LOCALSTATUS_serialize(struct S_MSG *target, struct S_MSP_LOCALSTATUS
 	memcpy(target->data+2,&src->rx_count,2);
 	memcpy(target->data+4,&src->tx_count,2);
 	memcpy(target->data+6,&src->rssi,1);
+	memcpy(target->data+7,&src->noise,1);
 
-	target->size = 7;
+	target->size = 8;
 }
 
 void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *msg) {
@@ -413,6 +414,7 @@ void mspmsg_LOCALSTATUS_parse(struct S_MSP_LOCALSTATUS *status, struct S_MSG *ms
 	memcpy(&status->rx_count,msg->data+2,2);
 	memcpy(&status->tx_count,msg->data+4,2);
 	memcpy(&status->rssi,msg->data+6,1);
+	memcpy(&status->noise,msg->data+7,1);
 }
 
 void mspmsg_HOST_WIFI_parse(struct S_MSP_HOST_WIFI *status, struct S_MSG *msg) {

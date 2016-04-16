@@ -220,6 +220,7 @@ struct S_MSP_LOCALSTATUS {
 	uint16_t rx_count;
 	uint16_t tx_count;
 	int8_t rssi;
+	int8_t noise;
 };
 
 struct S_MSP_HOST_WIFI {
