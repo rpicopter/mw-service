@@ -124,6 +124,11 @@ struct S_MSP_SERVO {
 	uint16_t servo[8]; 
 };
 
+struct S_MSP_ALTITUDE {
+	int32_t EstAlt; //cm
+	int16_t vario; //cm/s
+};
+
 struct S_MSP_RC {
 	uint16_t roll;
 	uint16_t pitch;

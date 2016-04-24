@@ -189,6 +189,19 @@ void mspmsg_ATTITUDE_parse(struct S_MSP_ATTITUDE *target, struct S_MSG *msg) {
 	target->heading = *reverse16(msg->data+4);
 }
 
+void mspmsg_ALTITUDE_serialize(struct S_MSG *target, struct S_MSP_ALTITUDE *src) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_ALTITUDE\n");
+    target->message_id = MSP_ALTITUDE;
+    target->size = 0;
+    //TODO: data	
+}
+
+void mspmsg_ALTITUDE_parse(struct S_MSP_ALTITUDE *target, struct S_MSG *msg) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_ALTITUDE\n");
+	target->EstAlt = *reverse32(msg->data);
+	target->vario = *reverse16(msg->data+4);
+}
+
 void mspmsg_RAW_GPS_serialize(struct S_MSG *target, struct S_MSP_RAW_GPS *src) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_ATTITUDE\n");
     target->message_id = MSP_RAW_GPS;
