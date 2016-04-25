@@ -262,6 +262,9 @@ void mspmsg_RAW_IMU_parse(struct S_MSP_RAW_IMU *imu, struct S_MSG *msg);
 void mspmsg_ATTITUDE_serialize(struct S_MSG *target, struct S_MSP_ATTITUDE *src);
 void mspmsg_ATTITUDE_parse(struct S_MSP_ATTITUDE *target, struct S_MSG *msg);
 
+void mspmsg_ALTITUDE_serialize(struct S_MSG *target, struct S_MSP_ALTITUDE *src);
+void mspmsg_ALTITUDE_parse(struct S_MSP_ALTITUDE *target, struct S_MSG *msg);
+
 void mspmsg_RAW_GPS_serialize(struct S_MSG *target, struct S_MSP_RAW_GPS *src);
 void mspmsg_RAW_GPS_parse(struct S_MSP_RAW_GPS *target, struct S_MSG *msg);
 
