@@ -205,7 +205,7 @@ enum box {
 /* This message is used for all BOX related processing */
 struct S_MSP_BOXCONFIG {
 	uint8_t supported[CHECKBOXITEMS];
-	uint16_t active[CHECKBOXITEMS];
+	uint16_t value[CHECKBOXITEMS];
 };
 
 enum stick {

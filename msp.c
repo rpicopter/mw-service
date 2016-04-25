@@ -304,12 +304,12 @@ void mspmsg_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *msg) {
 void mspmsg_BOX_parse(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg) {
 	uint8_t i,j = 0;
 	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_BOX\n");
-	memset(box->active,0,CHECKBOXITEMS);
+	memset(box->value,0,CHECKBOXITEMS);
 	dbg(DBG_MSP|DBG_VERBOSE,"Box config: ");
 	for (i=0;i<CHECKBOXITEMS;i++) {
 		if (box->supported[i]) {
-			box->active[i] = *reverse16(&msg->data[2*j]);
-			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,box->active[i]);
+			box->value[i] = *reverse16(&msg->data[2*j]);
+			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,box->value[i]);
 			j++;
 		}
 	}
@@ -328,8 +328,8 @@ void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src)
     dbg(DBG_MSP|DBG_VERBOSE,"Setting box config: ");
 	for (i=0;i<CHECKBOXITEMS;i++) {
 		if (src->supported[i]) {
-			memcpy(target->data+(j*2),reverse16(&src->active[i]),2);
-			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,src->active[i]);
+			memcpy(target->data+(j*2),reverse16(&src->value[i]),2);
+			dbg(DBG_MSP|DBG_VERBOSE,"%u=%u ",i,src->value[i]);
 			j++;
 		}
 	}
