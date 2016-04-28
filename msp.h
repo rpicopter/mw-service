@@ -92,6 +92,21 @@ struct S_MSP_STATUS {
 	uint8_t currentSet;
 };
 
+struct S_MSP_MISC {
+	uint16_t intPowerTrigger1;
+	uint16_t minthrottle;
+	uint16_t maxthrottle;
+	uint16_t mincommand;
+	uint16_t failsafe_throttle;
+	uint16_t arm;
+	uint32_t lifetime;
+	uint16_t mag_declination;
+	uint8_t vbatscale;
+	uint8_t vbatlevel_warn1;
+	uint8_t vbatlevel_warn2;
+	uint8_t vbatlevel_crit;
+};
+
 struct S_MSP_RAW_IMU {
 	int16_t accx;
 	int16_t accy;
@@ -118,6 +133,47 @@ struct S_MSP_RAW_GPS {
 	uint16_t alt;
 	uint16_t speed;
 	uint16_t ground_course;
+};
+
+struct S_MSP_WP {
+	uint8_t wp_no;
+	uint8_t action;
+	int32_t lat;
+	int32_t lon;
+	uint32_t alt_hold;
+	int16_t param1;
+	int16_t param2;
+	int16_t param3;
+	uint8_t flag;
+};
+
+struct S_MSP_NAV_CONFIG {
+  uint8_t filtering : 1;
+  uint8_t lead_filter : 1;
+  uint8_t dont_reset_home_at_arm : 1;
+  uint8_t nav_controls_heading : 1;
+  uint8_t nav_tail_first : 1;
+  uint8_t nav_rth_takeoff_heading : 1;
+  uint8_t slow_nav : 1;
+  uint8_t wait_for_rth_alt : 1;	
+
+  uint8_t ignore_throttle: 1; // Disable stick controls during mission and RTH
+  uint8_t takeover_baro: 1;
+
+  uint16_t wp_radius;           // in cm
+  uint16_t safe_wp_distance;    // in meter
+  uint16_t nav_max_altitude;    // in meter
+  uint16_t nav_speed_max;       // in cm/s
+  uint16_t nav_speed_min;       // in cm/s
+  uint8_t  crosstrack_gain;     // * 100 (0-2.56)
+  uint16_t nav_bank_max;        // degree * 100; (3000 default)
+  uint16_t rth_altitude;        // in meter
+  uint8_t  land_speed;          // between 50 and 255 (100 approx = 50cm/sec)
+  uint16_t fence;               // fence control in meters
+
+  uint8_t  max_wp_number;
+
+  uint8_t  checksum;    
 };
 
 struct S_MSP_SERVO {
@@ -250,45 +306,59 @@ uint8_t msp_is_armed(struct S_MSP_STATUS *status);
 /* Parsers and serializers 
  * By default each message has a create function and a parse function
  */
-void mspmsg_IDENT_serialize(struct S_MSG *target, struct S_MSP_IDENT *src); //creates a MSP_INDENT message
+void mspmsg_IDENT_serialize(struct S_MSG *target); //creates a MSP_INDENT message
 void mspmsg_IDENT_parse(struct S_MSP_IDENT *target, struct S_MSG *msg); //parses msg into MSP_INDENT structure
 
-void mspmsg_STATUS_serialize(struct S_MSG *target, struct S_MSP_STATUS *src); 
+void mspmsg_STATUS_serialize(struct S_MSG *target); 
 void mspmsg_STATUS_parse(struct S_MSP_STATUS *status, struct S_MSG *msg);
 
-void mspmsg_RAW_IMU_serialize(struct S_MSG *target, struct S_MSP_RAW_IMU *src);
+void mspmsg_MISC_serialize(struct S_MSG *target);
+void mspmsg_MISC_parse(struct S_MSP_MISC *misc, struct S_MSG *msg);
+void mspmsg_SET_MISC_serialize(struct S_MSG *target, struct S_MSP_MISC *src);
+
+void mspmsg_RAW_IMU_serialize(struct S_MSG *target);
 void mspmsg_RAW_IMU_parse(struct S_MSP_RAW_IMU *imu, struct S_MSG *msg);
 
-void mspmsg_ATTITUDE_serialize(struct S_MSG *target, struct S_MSP_ATTITUDE *src);
+void mspmsg_ATTITUDE_serialize(struct S_MSG *target);
 void mspmsg_ATTITUDE_parse(struct S_MSP_ATTITUDE *target, struct S_MSG *msg);
 
-void mspmsg_ALTITUDE_serialize(struct S_MSG *target, struct S_MSP_ALTITUDE *src);
+void mspmsg_ALTITUDE_serialize(struct S_MSG *target);
 void mspmsg_ALTITUDE_parse(struct S_MSP_ALTITUDE *target, struct S_MSG *msg);
 
-void mspmsg_RAW_GPS_serialize(struct S_MSG *target, struct S_MSP_RAW_GPS *src);
+void mspmsg_RAW_GPS_serialize(struct S_MSG *target);
 void mspmsg_RAW_GPS_parse(struct S_MSP_RAW_GPS *target, struct S_MSG *msg);
 
-void mspmsg_SERVO_serialize(struct S_MSG *target, struct S_MSP_SERVO *src);
+void mspmsg_WP_serialize(struct S_MSG *target, uint8_t wp_no);
+void mspmsg_WP_parse(struct S_MSP_WP *target, struct S_MSG *msg);
+
+void mspmsg_NAV_CONFIG_serialize(struct S_MSG *target);
+void mspmsg_NAV_CONFIG_parse(struct S_MSP_NAV_CONFIG *target, struct S_MSG *msg);
+
+void mspmsg_SERVO_serialize(struct S_MSG *target);
 void mspmsg_SERVO_parse(struct S_MSP_SERVO *servo, struct S_MSG *msg);
 
-void mspmsg_RC_serialize(struct S_MSG *target, struct S_MSP_RC *src);
+void mspmsg_RC_serialize(struct S_MSG *target);
 void mspmsg_SET_RAW_RC_serialize(struct S_MSG *target, struct S_MSP_RC *src);
 void mspmsg_RC_parse(struct S_MSP_RC *status, struct S_MSG *msg);
 
 //BOXIDS = supported boxes
-void mspmsg_BOXIDS_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src);
+void mspmsg_BOXIDS_serialize(struct S_MSG *target);
 void mspmsg_BOXIDS_parse(struct S_MSP_BOXCONFIG *boxconf, struct S_MSG *msg);
 
 //BOX = value for all supported boxes
-void mspmsg_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src);
+void mspmsg_BOX_serialize(struct S_MSG *target);
 void mspmsg_BOX_parse(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg);
 
 void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src); //create
 
-void mspmsg_PID_serialize(struct S_MSG *target, struct S_MSP_PIDITEMS *src);
+void mspmsg_PID_serialize(struct S_MSG *target);
 void mspmsg_PID_parse(struct S_MSP_PIDITEMS *piditems, struct S_MSG *msg);
 
 void mspmsg_SET_PID_serialize(struct S_MSG *target, struct S_MSP_PIDITEMS *src);
+
+void mspmsg_SELECT_SETTING_serialize(struct S_MSG *target, uint8_t set);
+
+void mspmsg_EEPROM_WRITE_serialize(struct S_MSG *target);
 
 /* USER DEFINED MESSAGES */
 void mspmsg_STICKCOMBO_serialize(struct S_MSG *target, struct S_MSP_STICKCOMBO *src);

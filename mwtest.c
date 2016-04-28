@@ -98,10 +98,10 @@ int main (int argc, char **argv)
 		return -1; //initiate channel to mw-service
 	}
 
-	mspmsg_IDENT_serialize(&msg,NULL); //prepare MSP_IDENT message
+	mspmsg_IDENT_serialize(&msg); //prepare MSP_IDENT message
 	shm_put_outgoing(&msg); //send it to the service
 
-	mspmsg_STATUS_serialize(&msg,NULL); //preparing MSP_STATUS message
+	mspmsg_STATUS_serialize(&msg); //preparing MSP_STATUS message
 	shm_put_outgoing(&msg); //send it to the service
 
 	//run loop
