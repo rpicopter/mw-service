@@ -273,8 +273,9 @@ int main (int argc, char **argv)
 				bufin_end+=ret;
 				while (ret=msg_parse(&msg,bufin+bufin_start,bufin_end-bufin_start)) { //retrieve msg from buffer 			
 					bufin_start+=ret;
-				 	if (msg.message_id)
+				 	if (msg.message_id) {
 						shm_put_incoming(&msg);
+					}
 				}
 				if (bufin_start) { //rewind buffer by number of process bytes			
 					memmove(bufin,bufin+bufin_start,bufin_end-bufin_start);

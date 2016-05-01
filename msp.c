@@ -175,7 +175,7 @@ void mspmsg_MISC_parse(struct S_MSP_MISC *misc, struct S_MSG *msg) {
 
 void mspmsg_SET_MISC_serialize(struct S_MSG *target, struct S_MSP_MISC *src) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing MSP_SET_MISC\n");
-
+	target->message_id = MSP_SET_MISC;
 	if (src==NULL) {
 		target->size = 0;
 		return;
