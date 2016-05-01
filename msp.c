@@ -317,6 +317,45 @@ void mspmsg_NAV_CONFIG_parse(struct S_MSP_NAV_CONFIG *target, struct S_MSG *msg)
 	target->checksum = *(msg->data+21);
 };
 
+void mspmsg_NAV_CONFIG_SET_serialize(struct S_MSG *target, struct S_MSP_NAV_CONFIG *src) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SET_NAV_CONFIG\n");
+    target->message_id = MSP_SET_NAV_CONFIG;
+
+    uint8_t b;
+
+    b = src->filtering?1:0; b<<=1;
+    b = src->lead_filter?1:0; b<<=1;
+    b = src->dont_reset_home_at_arm?1:0; b<<=1;
+    b = src->nav_controls_heading?1:0; b<<=1;
+    b = src->nav_tail_first?1:0; b<<=1;
+    b = src->nav_rth_takeoff_heading?1:0; b<<=1;
+    b = src->slow_nav?1:0; b<<=1;
+    b = src->wait_for_rth_alt?1:0;
+    target->data[0] = b;
+
+    b = src->ignore_throttle?1:0; b<<=1;
+    b = src->takeover_baro?1:0;
+    target->data[1] = b;
+
+	memcpy(target->data+2,reverse16(&src->wp_radius),2);
+	memcpy(target->data+4,reverse16(&src->safe_wp_distance),2);
+	memcpy(target->data+6,reverse16(&src->nav_max_altitude),2);
+	memcpy(target->data+8,reverse16(&src->nav_speed_max),2);
+	memcpy(target->data+10,reverse16(&src->nav_speed_min),2);
+	memcpy(target->data+12,&src->crosstrack_gain,1);
+	memcpy(target->data+13,reverse16(&src->nav_bank_max),2);
+	memcpy(target->data+15,reverse16(&src->rth_altitude),2);
+	memcpy(target->data+17,&src->land_speed,1);
+	memcpy(target->data+18,reverse16(&src->fence),2);
+
+	memcpy(target->data+20,&src->max_wp_number,1);
+
+	memcpy(target->data+21,&src->checksum,1); 
+
+    target->size = 22;	
+
+}
+
 void mspmsg_SERVO_serialize(struct S_MSG *target) {
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SERVO\n");
     target->message_id = MSP_SERVO;

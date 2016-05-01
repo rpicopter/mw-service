@@ -176,6 +176,7 @@ struct S_MSP_NAV_CONFIG {
   uint8_t  checksum;    
 };
 
+
 struct S_MSP_SERVO {
 	uint16_t servo[8]; 
 };
@@ -333,6 +334,8 @@ void mspmsg_WP_parse(struct S_MSP_WP *target, struct S_MSG *msg);
 
 void mspmsg_NAV_CONFIG_serialize(struct S_MSG *target);
 void mspmsg_NAV_CONFIG_parse(struct S_MSP_NAV_CONFIG *target, struct S_MSG *msg);
+
+void mspmsg_NAV_CONFIG_SET_serialize(struct S_MSG *target, struct S_MSP_NAV_CONFIG *src);
 
 void mspmsg_SERVO_serialize(struct S_MSG *target);
 void mspmsg_SERVO_parse(struct S_MSP_SERVO *servo, struct S_MSG *msg);
