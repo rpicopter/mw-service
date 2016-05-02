@@ -408,6 +408,38 @@ void mspmsg_RC_parse(struct S_MSP_RC *rc, struct S_MSG *msg) {
 	dbg(DBG_MSP|DBG_VERBOSE,"R: %04x, P: %04x, Y: %04x, T: %04x, A1: %04x, A2: %04x, A3: %04x, A4: %04x\n",rc->roll,rc->pitch,rc->yaw,rc->throttle, rc->aux1, rc->aux2, rc->aux3, rc->aux4);
 }
 
+void mspmsg_RC_TUNING_serialize(struct S_MSG *target) {
+    dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_RC_TUNING\n");
+    target->message_id = MSP_RC_TUNING;
+    target->size = 0;
+}
+
+void mspmsg_RC_TUNING_parse(struct S_MSP_RC_TUNING *rct, struct S_MSG *msg) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_RC_TUNING\n");
+	rct->rcRate = *(msg->data);
+	rct->rcExpo = *(msg->data+1);
+	rct->rollPitchRate = *(msg->data+2);
+	rct->yawRate = *(msg->data+3);
+	rct->dynThrPID = *(msg->data+4);
+	rct->thrMid = *(msg->data+5);
+	rct->thrExpo = *(msg->data+6);
+}
+
+void mspmsg_SET_RC_TUNING_serialize(struct S_MSG *target, struct S_MSP_RC_TUNING *src) {
+    dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_SET_RC_TUNING\n");
+    target->message_id = MSP_SET_RC_TUNING;
+
+	*(target->data) = src->rcRate;
+	*(target->data+1) = src->rcExpo;
+	*(target->data+2) = src->rollPitchRate;
+	*(target->data+3) = src->yawRate;
+	*(target->data+4) = src->dynThrPID;
+	*(target->data+5) = src->thrMid;
+	*(target->data+6) = src->thrExpo;
+
+    target->size = 7;
+}
+
 void mspmsg_BOXIDS_serialize(struct S_MSG *target) {
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_BOXIDS\n");
     target->message_id = MSP_BOXIDS;

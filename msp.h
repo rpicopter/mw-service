@@ -197,6 +197,16 @@ struct S_MSP_RC {
 	uint16_t aux4;	
 };
 
+struct S_MSP_RC_TUNING {
+	uint8_t rcRate;
+	uint8_t rcExpo;
+	uint8_t rollPitchRate;
+	uint8_t yawRate;
+	uint8_t dynThrPID;
+	uint8_t thrMid;
+	uint8_t thrExpo;
+};
+
 struct S_MSP_PID {
  	uint8_t P8;
  	uint8_t I8;
@@ -343,6 +353,10 @@ void mspmsg_SERVO_parse(struct S_MSP_SERVO *servo, struct S_MSG *msg);
 void mspmsg_RC_serialize(struct S_MSG *target);
 void mspmsg_SET_RAW_RC_serialize(struct S_MSG *target, struct S_MSP_RC *src);
 void mspmsg_RC_parse(struct S_MSP_RC *status, struct S_MSG *msg);
+
+void mspmsg_RC_TUNING_serialize(struct S_MSG *target);
+void mspmsg_RC_TUNING_parse(struct S_MSP_RC_TUNING *rct, struct S_MSG *msg);
+void mspmsg_SET_RC_TUNING_serialize(struct S_MSG *target, struct S_MSP_RC_TUNING *src);
 
 //BOXIDS = supported boxes
 void mspmsg_BOXIDS_serialize(struct S_MSG *target);
