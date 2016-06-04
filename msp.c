@@ -110,8 +110,20 @@ uint8_t msp_get_boxid(const char *name) {
 	return UINT8_MAX;	
 }
 
+uint8_t msp_is_boxactive(struct S_MSP_STATUS *status, struct S_MSP_BOXCONFIG *boxconf, uint8_t box) {
+	uint8_t c = 0;
+	uint8_t i;
+
+	for (i=0;i<box;i++)
+		if (boxconf->supported[i]) c++;
+
+	if (status->flag & (1<<c)) return 1;
+
+	return 0;
+}
+
 uint8_t msp_is_armed(struct S_MSP_STATUS *status) {
-	//the arm flag is the very last bit
+	//the arm flag is always the very last bit
 	return get_bit(status->flag,0); 
 
 }
