@@ -376,6 +376,8 @@ void mspmsg_SET_PID_serialize(struct S_MSG *target, struct S_MSP_PIDITEMS *src);
 
 void mspmsg_SELECT_SETTING_serialize(struct S_MSG *target, uint8_t set);
 
+void mspmsg_SET_HEAD_serialize(struct S_MSG *target, int16_t target_heading);
+
 void mspmsg_EEPROM_WRITE_serialize(struct S_MSG *target);
 
 /* USER DEFINED MESSAGES */

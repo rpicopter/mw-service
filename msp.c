@@ -556,6 +556,13 @@ void mspmsg_SELECT_SETTING_serialize(struct S_MSG *target, uint8_t set) {
     target->size = 1;
 }
 
+void mspmsg_SET_HEAD_serialize(struct S_MSG *target, int16_t target_heading) {
+    dbg(DBG_MSP|DBG_VERBOSE,"Preparing message SET_HEAD\n");
+    target->message_id = MSP_SET_HEAD;
+    memcpy(target->data,reverse16(&target_heading),2);
+    target->size = 2;
+}
+
 void mspmsg_EEPROM_WRITE_serialize(struct S_MSG *target) {
     dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_EEPROM_WRITE\n");
     target->message_id = MSP_EEPROM_WRITE;
