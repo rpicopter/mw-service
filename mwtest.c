@@ -54,10 +54,11 @@ void listen() {
 	struct S_MSP_STATUS status;
 	uint8_t counter = wait_s;
 	uint16_t msg_counter = 0;
+	uint8_t f[2] = {MSP_IDENT,MSP_STATUS}; 
 
 	while (!stop) {
 		mssleep(1000);
-		if (shm_scan_incoming(&msg)) { //check if there are any messages for us
+		if (shm_scan_incoming_f(&msg,f,2)) { //check if there are any messages for us
 			printf("Msg ID: %u\n",msg.message_id);
 			msg_counter++;
 			switch (msg.message_id) {
