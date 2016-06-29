@@ -18,10 +18,10 @@ MW also provides an API for other programs to use for communication.
 === INSTALLATION ===
 Ensure you have:
 - libtool
-- autotools
 - automake
 
 Run ./autogen.sh (you will need automake for this to run)
+Run ./configure.sh
 Run make & make install
 
 === SERVICE USAGE (mw) ===
