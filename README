@@ -20,8 +20,8 @@ Ensure you have:
 - libtool
 - automake
 
+Run libtoolize
 Run ./autogen.sh (you will need automake for this to run)
-Run ./configure.sh
 Run make & make install
 
 === SERVICE USAGE (mw) ===
