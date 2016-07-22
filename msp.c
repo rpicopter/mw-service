@@ -512,6 +512,21 @@ void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src)
 	target->size = 2*j;
 }
 
+void mspmsg_ANALOG_serialize(struct S_MSG *target) {
+    dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_ANALOG\n");
+    target->message_id = MSP_ANALOG;
+    target->size = 0;
+}
+
+void mspmsg_ANALOG_parse(struct S_MSP_ANALOG *analog, struct S_MSG *msg) {
+	dbg(DBG_MSP|DBG_VERBOSE,"Parsing MSP_ANALOG\n");
+	analog->vbat = *(msg->data);
+	analog->intPowerMeterSum = *reverse16(msg->data+1);
+	analog->rssi = *reverse16(msg->data+3);
+	analog->amperage = *reverse16(msg->data+5);
+}
+
+
 void mspmsg_PID_serialize(struct S_MSG *target) {
 	dbg(DBG_MSP|DBG_VERBOSE,"Preparing message MSP_PID\n");
 	target->message_id = MSP_PID;

@@ -207,6 +207,13 @@ struct S_MSP_RC_TUNING {
 	uint8_t thrExpo;
 };
 
+struct S_MSP_ANALOG {
+	uint8_t vbat;
+	uint16_t intPowerMeterSum;
+	uint16_t rssi;
+	uint16_t amperage; 
+};
+
 struct S_MSP_PID {
  	uint8_t P8;
  	uint8_t I8;
@@ -368,6 +375,10 @@ void mspmsg_BOX_serialize(struct S_MSG *target);
 void mspmsg_BOX_parse(struct S_MSP_BOXCONFIG *box, struct S_MSG *msg);
 
 void mspmsg_SET_BOX_serialize(struct S_MSG *target, struct S_MSP_BOXCONFIG *src); //create
+
+void mspmsg_ANALOG_serialize(struct S_MSG *target);
+void mspmsg_ANALOG_parse(struct S_MSP_ANALOG *analog, struct S_MSG *msg);
+
 
 void mspmsg_PID_serialize(struct S_MSG *target);
 void mspmsg_PID_parse(struct S_MSP_PIDITEMS *piditems, struct S_MSG *msg);
