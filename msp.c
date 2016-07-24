@@ -125,7 +125,11 @@ uint8_t msp_is_boxactive(struct S_MSP_STATUS *status, struct S_MSP_BOXCONFIG *bo
 uint8_t msp_is_armed(struct S_MSP_STATUS *status) {
 	//the arm flag is always the very last bit
 	return get_bit(status->flag,0); 
+}
 
+uint8_t msp_has_gps(struct S_MSP_STATUS *status) {
+	//the arm flag is always the very last bit
+	return get_bit(status->sensor,1);  //0-sonar, 1-gps, 2-mag, 3-baro, 4-acc
 }
 
 /* constructors and parsers for all messages */

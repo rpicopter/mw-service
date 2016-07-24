@@ -320,6 +320,7 @@ uint8_t msp_get_box_count();
 /* Gets arm status for the quadcopter based on flag in status message */
 uint8_t msp_is_armed(struct S_MSP_STATUS *status);
 uint8_t msp_is_boxactive(struct S_MSP_STATUS *status, struct S_MSP_BOXCONFIG *boxconf, uint8_t box);
+uint8_t msp_has_gps(struct S_MSP_STATUS *status);
 
 
 /* Parsers and serializers 
