@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdint.h>
 
 #define GPIO_LOW 0
 #define GPIO_HIGH 1
